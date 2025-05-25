@@ -1,0 +1,255 @@
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 2rem;
+}
+
+.auth-box {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    animation: slideUp 0.5s ease-out;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-header h2 {
+    color: var(--secondary-color);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.auth-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tab-btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    background: none;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-group input {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.1);
+}
+
+.forgot-password {
+    text-align: right;
+}
+
+.forgot-password a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+    color: var(--accent-color);
+}
+
+.submit-btn {
+    background: var(--primary-color);
+    color: white;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+.social-login {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.social-login p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.social-login p::before,
+.social-login p::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 30%;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.social-login p::before {
+    left: 0;
+}
+
+.social-login p::after {
+    right: 0;
+}
+
+.social-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: white;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+    background: var(--background-light);
+    transform: translateY(-2px);
+}
+
+.social-btn.google {
+    color: #DB4437;
+}
+
+.social-btn.facebook {
+    color: #4267B2;
+}
+
+/* Dark mode styles */
+body.dark-mode .auth-box {
+    background: #1f1f1f;
+}
+
+body.dark-mode .auth-header h2 {
+    color: #f1f1f1;
+}
+
+body.dark-mode .auth-header p,
+body.dark-mode .form-group label {
+    color: #bcbcbc;
+}
+
+body.dark-mode .form-group input {
+    background: #2d2d2d;
+    border-color: #3d3d3d;
+    color: #f1f1f1;
+}
+
+body.dark-mode .form-group input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(243, 156, 18, 0.2);
+}
+
+body.dark-mode .social-btn {
+    background: #2d2d2d;
+    border-color: #3d3d3d;
+    color: #f1f1f1;
+}
+
+body.dark-mode .social-btn:hover {
+    background: #3d3d3d;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .auth-box {
+        padding: 2rem;
+    }
+
+    .auth-header h2 {
+        font-size: 1.75rem;
+    }
+
+    .tab-btn {
+        padding: 0.5rem 1.5rem;
+    }
+
+    .social-buttons {
+        flex-direction: column;
+    }
+
+    .social-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
