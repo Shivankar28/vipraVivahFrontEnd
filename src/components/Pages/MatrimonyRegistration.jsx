@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTheme } from '../../context/ThemeContext';
 import { HeartHandshake, Moon, Sun, Save, ArrowLeft, Upload, Camera } from 'lucide-react';
 import { createUpdateProfile, getProfile } from '../../redux/slices/profileSlice';
-import { handleApiError } from '../../api/apiUtils';
+import { handleApiError } from '../../api/APIUtils';
 import { jwtDecode } from 'jwt-decode';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -395,7 +395,7 @@ export default function MatrimonyRegistration() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center relative">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/')}
               className={`flex items-center space-x-2 ${
                 darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-700'
               } transition-colors duration-200`}

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import APIConnector from '../../api/apiConnector';
+import APIConnector from '../../api/APIConnector';
 import { handleApiError } from '../../api/APIUtils';
 
 // Utility to check if in development mode

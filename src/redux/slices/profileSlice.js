@@ -1,7 +1,7 @@
 // profileSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import APIConnector from '../../api/apiConnector';
-import { createProfileFormData, handleApiError } from '../../api/apiUtils';
+import APIConnector from '../../api/APIConnector';
+import { createProfileFormData, handleApiError } from '../../api/APIUtils';
 
 // Utility to check if in development mode
 const isDev = process.env.NODE_ENV === 'development';
