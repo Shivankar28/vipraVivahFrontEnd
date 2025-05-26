@@ -265,13 +265,13 @@ export default function MatrimonyRegistration() {
     if (isDev) {
       console.group('MatrimonyRegistration: handleDateOfBirthChange');
       console.log('DOB:', dob);
+      console.groupEnd();
     }
     setFormData((prev) => ({
       ...prev,
       dateOfBirth: dob,
     }));
     setFormError('');
-    if (isDev) console.groupEnd();
   };
 
   const handleCheckboxChange = (e) => {
@@ -347,8 +347,10 @@ export default function MatrimonyRegistration() {
         company: formData.company,
         workLocation: formData.workLocation,
         annualIncome: formData.annualIncome,
-        idVerificationType: formData.idVerificationType,
-        idVerificationNumber: formData.idVerificationNumber,
+        ...(isProfileFlag ? {} : { // Conditionally include ID verification fields
+          idVerificationType: formData.idVerificationType,
+          idVerificationNumber: formData.idVerificationNumber,
+        }),
       };
 
       // Validate currentAddress (at least one field required)
@@ -550,12 +552,12 @@ export default function MatrimonyRegistration() {
               'Education Details',
               'Career Details',
               'Social Media Profiles',
-              'ID Verification',
+              ...(isProfileFlag ? [] : ['ID Verification']), // Conditionally include ID Verification
             ].map((section, index) => (
               <section
                 key={index}
                 className={`space-y-8 pb-12 ${
-                  index < 7 ? (darkMode ? 'border-b border-gray-700' : 'border-b border-gray-200') : ''
+                  index < (isProfileFlag ? 6 : 7) ? (darkMode ? 'border-b border-gray-700' : 'border-b border-gray-200') : ''
                 } ${darkMode ? 'hover:bg-gray-800/30' : 'hover:bg-gray-50'} rounded-lg transition-colors duration-200 p-6`}
                 aria-label={section}
               >
@@ -582,7 +584,7 @@ export default function MatrimonyRegistration() {
                           name="profileFor"
                           value={formData.profileFor}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 px-[0.3vw] block w-full rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -611,7 +613,7 @@ export default function MatrimonyRegistration() {
                           name="gender"
                           value={formData.gender}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 px-[0.3vw] block w-full rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -637,7 +639,7 @@ export default function MatrimonyRegistration() {
                           name="lookingFor"
                           value={formData.lookingFor}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 px-[0.3vw] block w-full rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -668,7 +670,7 @@ export default function MatrimonyRegistration() {
                           name="firstName"
                           value={formData.firstName}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 px-[0.3vw] block w-full rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -690,7 +692,7 @@ export default function MatrimonyRegistration() {
                           name="middleName"
                           value={formData.middleName}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 px-[0.3vw] block w-full rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -710,7 +712,7 @@ export default function MatrimonyRegistration() {
                           name="lastName"
                           value={formData.lastName}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -732,7 +734,7 @@ export default function MatrimonyRegistration() {
                           name="phoneNumber"
                           value={formData.phoneNumber}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -759,7 +761,7 @@ export default function MatrimonyRegistration() {
                           name="fatherName"
                           value={formData.fatherName}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -781,7 +783,7 @@ export default function MatrimonyRegistration() {
                           name="motherName"
                           value={formData.motherName}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -848,7 +850,7 @@ export default function MatrimonyRegistration() {
                           name="dateOfBirth"
                           value={formData.dateOfBirth}
                           onChange={handleDateOfBirthChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -870,7 +872,7 @@ export default function MatrimonyRegistration() {
                           name="height"
                           value={formData.height}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -892,7 +894,7 @@ export default function MatrimonyRegistration() {
                           name="subCaste"
                           value={formData.subCaste}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -923,7 +925,7 @@ export default function MatrimonyRegistration() {
                           name="gotra"
                           value={formData.gotra}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -944,7 +946,7 @@ export default function MatrimonyRegistration() {
                           name="motherTongue"
                           value={formData.motherTongue}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -977,7 +979,7 @@ export default function MatrimonyRegistration() {
                           name="maritalStatus"
                           value={formData.maritalStatus}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1003,7 +1005,7 @@ export default function MatrimonyRegistration() {
                           name="foodHabit"
                           value={formData.foodHabit}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1184,7 +1186,7 @@ export default function MatrimonyRegistration() {
                           name="highestQualification"
                           value={formData.highestQualification}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1214,7 +1216,7 @@ export default function MatrimonyRegistration() {
                           name="specialization"
                           value={formData.specialization}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1249,7 +1251,7 @@ export default function MatrimonyRegistration() {
                           name="university"
                           value={formData.university}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1271,7 +1273,7 @@ export default function MatrimonyRegistration() {
                           name="yearOfCompletion"
                           value={formData.yearOfCompletion}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1337,7 +1339,7 @@ export default function MatrimonyRegistration() {
                           name="occupation"
                           value={formData.occupation}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1371,7 +1373,7 @@ export default function MatrimonyRegistration() {
                           name="company"
                           value={formData.company}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1387,21 +1389,20 @@ export default function MatrimonyRegistration() {
                         >
                           Work Location <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
-                     <input
-  type="text"
-  id="workLocation"
-  name="workLocation"
-  value={formData.workLocation}
-  onChange={handleInputChange}
-  className={`mt-1 block w-full rounded-md ${
-    darkMode
-      ? 'bg-gray-700 border-gray-600 text-white'
-      : 'bg-white border-gray-300 text-gray-900'
-  } shadow-sm focus:border-red-500 focus:ring-red-500`}
-  required
-  aria-required="true"
-/>
-
+                        <input
+                          type="text"
+                          id="workLocation"
+                          name="workLocation"
+                          value={formData.workLocation}
+                          onChange={handleInputChange}
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
+                            darkMode
+                              ? 'bg-gray-700 border-gray-600 text-white'
+                              : 'bg-white border-gray-300 text-gray-900'
+                          } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
+                        />
                       </div>
                       <div>
                         <label
@@ -1415,7 +1416,7 @@ export default function MatrimonyRegistration() {
                           name="annualIncome"
                           value={formData.annualIncome}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1452,7 +1453,7 @@ export default function MatrimonyRegistration() {
                           name="instagram"
                           value={formData.instagram}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1472,7 +1473,7 @@ export default function MatrimonyRegistration() {
                           name="facebook"
                           value={formData.facebook}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1492,7 +1493,7 @@ export default function MatrimonyRegistration() {
                           name="linkedin"
                           value={formData.linkedin}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1501,7 +1502,7 @@ export default function MatrimonyRegistration() {
                       </div>
                     </>
                   )}
-                  {section === 'ID Verification' && (
+                  {section === 'ID Verification' && !isProfileFlag && (
                     <>
                       <div>
                         <label
@@ -1515,7 +1516,7 @@ export default function MatrimonyRegistration() {
                           name="idVerificationType"
                           value={formData.idVerificationType}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
@@ -1543,7 +1544,7 @@ export default function MatrimonyRegistration() {
                           name="idVerificationNumber"
                           value={formData.idVerificationNumber}
                           onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
+                          className={`mt-1 block w-full px-[0.3vw] rounded-md ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
