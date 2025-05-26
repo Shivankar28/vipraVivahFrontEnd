@@ -6,6 +6,7 @@ import { HeartHandshake, Moon, Sun, Save, ArrowLeft, Upload, Camera } from 'luci
 import { createUpdateProfile, getProfile } from '../../redux/slices/profileSlice';
 import { handleApiError } from '../../api/APIUtils';
 import { jwtDecode } from 'jwt-decode';
+import { Link } from 'react-router-dom';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -123,10 +124,8 @@ export default function MatrimonyRegistration() {
       const token = localStorage.getItem('token');
       if (isDev) console.group('MatrimonyRegistration: Fetch Profile');
       dispatch(getProfile(token)).then((result) => {
-
         if (result.meta.requestStatus === 'fulfilled' && result.payload.data?.profile) {
           const profileData = result.payload.data.profile;
-          console.log("inside matrimony registrat")
           if (isDev) console.log('Profile fetched:', profileData);
           setFormData((prev) => ({
             ...prev,
@@ -139,7 +138,7 @@ export default function MatrimonyRegistration() {
             fatherName: profileData.fatherName || '',
             motherName: profileData.motherName || '',
             dateOfBirth: profileData.dateOfBirth ? profileData.dateOfBirth.split('T')[0] : '',
-            subCaste: profileData.subcaste || '', // Use frontend field name from transformProfileForFrontend
+            subCaste: profileData.subcaste || '',
             gotra: profileData.gotra || '',
             motherTongue: profileData.motherTongue || '',
             lookingFor: profileData.lookingFor || '',
@@ -159,17 +158,17 @@ export default function MatrimonyRegistration() {
             },
             isLivesWithFamily: profileData.isLivesWithFamily || null,
             maritalStatus: profileData.maritalStatus || '',
-            foodHabit: profileData.foodHabits || '', // Use frontend field name
+            foodHabit: profileData.foodHabits || '',
             highestQualification: profileData.HighestQualification || '',
             specialization: profileData.specialization || '',
-            university: profileData.university || '', // Use frontend field name
+            university: profileData.university || '',
             yearOfCompletion: profileData.yearOfCompletion || '',
             currentWorking: profileData.currentWorking || null,
             occupation: profileData.occupation || '',
             company: profileData.company || '',
             workLocation: profileData.workLocation || '',
             annualIncome: profileData.annualIncome || '',
-            instagram: profileData.instagram || '', // Use frontend field name
+            instagram: profileData.instagram || '',
             facebook: profileData.facebook || '',
             linkedin: profileData.linkedin || '',
             idVerificationType: profileData.idVerification?.type || '',
@@ -210,7 +209,7 @@ export default function MatrimonyRegistration() {
         [name]: value,
       }));
     }
-    setFormError(''); // Clear error on input change
+    setFormError('');
     if (isDev) {
       console.log('Input:', { name, value });
       console.groupEnd();
@@ -322,29 +321,65 @@ export default function MatrimonyRegistration() {
 
     if (isDev) console.group('MatrimonyRegistration: handleSubmit');
     try {
-      // Basic validation for user experience
-      if (
-        !formData.profileFor ||
-        !formData.gender ||
-        !formData.firstName ||
-        !formData.lastName ||
-        !formData.dateOfBirth ||
-        !formData.gotra ||
-        !formData.motherTongue ||
-        !formData.maritalStatus ||
-        !formData.phoneNumber ||
-        !formData.lookingFor
-      ) {
-        throw new Error('Please fill in all required fields');
+      // Required fields validation
+      const requiredFields = {
+        profileFor: formData.profileFor,
+        gender: formData.gender,
+        phoneNumber: formData.phoneNumber,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        fatherName: formData.fatherName,
+        motherName: formData.motherName,
+        dateOfBirth: formData.dateOfBirth,
+        subCaste: formData.subCaste,
+        gotra: formData.gotra,
+        motherTongue: formData.motherTongue,
+        lookingFor: formData.lookingFor,
+        height: formData.height,
+        maritalStatus: formData.maritalStatus,
+        foodHabit: formData.foodHabit,
+        highestQualification: formData.highestQualification,
+        specialization: formData.specialization,
+        university: formData.university,
+        yearOfCompletion: formData.yearOfCompletion,
+        currentWorking: formData.currentWorking,
+        occupation: formData.occupation,
+        company: formData.company,
+        workLocation: formData.workLocation,
+        annualIncome: formData.annualIncome,
+        idVerificationType: formData.idVerificationType,
+        idVerificationNumber: formData.idVerificationNumber,
+      };
+
+      // Validate currentAddress (at least one field required)
+      const hasCurrentAddress = ['street', 'city', 'state', 'pincode'].some(
+        (field) => formData.currentAddress[field]
+      );
+
+      // Validate permanentAddress if sameAsTemporary is false
+      const hasPermanentAddress = formData.permanentAddress.sameAsTemporary
+        ? true
+        : ['street', 'city', 'state', 'pincode'].some((field) => formData.permanentAddress[field]);
+
+      // Check for missing required fields
+      const missingFields = Object.keys(requiredFields).filter((key) => !requiredFields[key]);
+      if (missingFields.length > 0) {
+        throw new Error(`Please fill in required fields: ${missingFields.join(', ')}`);
       }
       if (!/^\d{10}$/.test(formData.phoneNumber)) {
         throw new Error('Phone number must be 10 digits');
       }
-      const hasCurrentAddress = ['street', 'city', 'state', 'pincode'].some(
-        (field) => formData.currentAddress[field]
-      );
       if (!hasCurrentAddress) {
         throw new Error('At least one current address field is required');
+      }
+      if (!hasPermanentAddress) {
+        throw new Error('At least one permanent address field is required when not same as current address');
+      }
+      if (!profileImage && !profileImagePreview) {
+        throw new Error('Profile photo is required');
+      }
+      if (formData.isLivesWithFamily === null) {
+        throw new Error('Please specify if you live with family');
       }
 
       const result = await dispatch(
@@ -404,7 +439,7 @@ export default function MatrimonyRegistration() {
               <ArrowLeft className="w-5 h-5" />
               <span>Back</span>
             </button>
-            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-2">
+            <Link to="/" className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-2">
               <HeartHandshake className={`w-8 h-8 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
               <span className="flex items-baseline">
                 <span
@@ -415,7 +450,7 @@ export default function MatrimonyRegistration() {
                   विप्रVivah
                 </span>
               </span>
-            </div>
+            </Link>
             <button
               onClick={toggleDarkMode}
               className={`p-2 rounded-full transition-all duration-200 ${
@@ -498,12 +533,13 @@ export default function MatrimonyRegistration() {
                   onChange={handleImageChange}
                   className="hidden"
                   aria-label="Upload profile photo"
+                  required={!profileImagePreview} // Required if no image is already set
                 />
                 <Upload className="w-5 h-5 mr-3" aria-hidden="true" />
-                <span className="text-lg">Upload Profile Photo</span>
+                <span className="text-lg">Upload Profile Photo <span className="text-red-200">*</span></span>
               </label>
               <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                Maximum file size: 5MB. Only JPEG/PNG allowed.
+                Maximum file size: 5MB. Only JPEG/PNG allowed. <span className="text-red-500">*Required</span>
               </p>
             </section>
             {[
@@ -715,7 +751,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="fatherName"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          Father's Name
+                          Father's Name <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <input
                           type="text"
@@ -728,6 +764,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         />
                       </div>
                       <div>
@@ -735,7 +773,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="motherName"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          Mother's Name
+                          Mother's Name <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <input
                           type="text"
@@ -748,6 +786,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         />
                       </div>
                       <div>
@@ -755,7 +795,7 @@ export default function MatrimonyRegistration() {
                           <legend
                             className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                           >
-                            Lives with Family
+                            Lives with Family <span className="text-red-500" aria-hidden="true">*</span>
                           </legend>
                           <div className="mt-2 space-x-4">
                             <label className="inline-flex items-center">
@@ -767,6 +807,7 @@ export default function MatrimonyRegistration() {
                                 onChange={handleRadioChange}
                                 className="form-radio text-red-500"
                                 aria-label="Lives with family: Yes"
+                                required
                               />
                               <span className={`ml-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 Yes
@@ -781,6 +822,7 @@ export default function MatrimonyRegistration() {
                                 onChange={handleRadioChange}
                                 className="form-radio text-red-500"
                                 aria-label="Lives with family: No"
+                                required
                               />
                               <span className={`ml-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 No
@@ -820,7 +862,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="height"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          Height (cm)
+                          Height (cm) <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <input
                           type="number"
@@ -833,6 +875,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                           placeholder="e.g., 170"
                         />
                       </div>
@@ -841,7 +885,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="subCaste"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          Subcaste
+                          Subcaste <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <select
                           id="subCaste"
@@ -853,6 +897,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         >
                           <option value="">Select Subcaste</option>
                           <option value="chitpavan">Chitpavan</option>
@@ -950,7 +996,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="foodHabit"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          Food Habits
+                          Food Habits <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <select
                           id="foodHabit"
@@ -962,6 +1008,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         >
                           <option value="">Select</option>
                           <option value="vegetarian">Vegetarian</option>
@@ -1113,6 +1161,11 @@ export default function MatrimonyRegistration() {
                               />
                             </div>
                           )}
+                          <p className={`mt-2 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {formData.permanentAddress.sameAsTemporary
+                              ? 'Permanent address will be same as current address.'
+                              : 'At least one field (Street, City, State, or Pincode) is required.'}
+                          </p>
                         </fieldset>
                       </div>
                     </>
@@ -1124,7 +1177,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="highestQualification"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          Highest Qualification
+                          Highest Qualification <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <select
                           id="highestQualification"
@@ -1136,6 +1189,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         >
                           <option value="">Select Qualification</option>
                           <option value="high_school">High School</option>
@@ -1152,7 +1207,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="specialization"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          Specialization
+                          Specialization <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <select
                           id="specialization"
@@ -1164,6 +1219,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         >
                           <option value="">Select Specialization</option>
                           <option value="computer_science">Computer Science</option>
@@ -1184,7 +1241,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="university"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          University/College
+                          University/College <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <input
                           type="text"
@@ -1197,6 +1254,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         />
                       </div>
                       <div>
@@ -1204,7 +1263,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="yearOfCompletion"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          Year of Completion
+                          Year of Completion <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <input
                           type="text"
@@ -1217,6 +1276,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         />
                       </div>
                     </>
@@ -1228,7 +1289,7 @@ export default function MatrimonyRegistration() {
                           <legend
                             className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                           >
-                            Currently Working
+                            Currently Working <span className="text-red-500" aria-hidden="true">*</span>
                           </legend>
                           <div className="mt-2 space-x-4">
                             <label className="inline-flex items-center">
@@ -1240,6 +1301,7 @@ export default function MatrimonyRegistration() {
                                 onChange={handleRadioChange}
                                 className="form-radio text-red-500"
                                 aria-label="Currently working: Yes"
+                                required
                               />
                               <span className={`ml-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 Yes
@@ -1254,6 +1316,7 @@ export default function MatrimonyRegistration() {
                                 onChange={handleRadioChange}
                                 className="form-radio text-red-500"
                                 aria-label="Currently working: No"
+                                required
                               />
                               <span className={`ml-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 No
@@ -1267,7 +1330,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="occupation"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          Occupation
+                          Occupation <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <select
                           id="occupation"
@@ -1279,6 +1342,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         >
                           <option value="">Select Occupation</option>
                           <option value="software_engineer">Software Engineer</option>
@@ -1298,7 +1363,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="company"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          Company
+                          Company <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <input
                           type="text"
@@ -1311,6 +1376,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         />
                       </div>
                       <div>
@@ -1318,27 +1385,30 @@ export default function MatrimonyRegistration() {
                           htmlFor="workLocation"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          Work Location
+                          Work Location <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
-                        <input
-                          type="text"
-                          id="workLocation"
-                          name="workLocation"
-                          value={formData.workLocation}
-                          onChange={handleInputChange}
-                          className={`mt-1 block w-full rounded-md ${
-                            darkMode
-                              ? 'bg-gray-700 border-gray-600 text-white'
-                              : 'bg-white border-gray-300 text-gray-900'
-                          } shadow-sm focus:border-red-500 focus:ring-red-500`}
-                        />
+                     <input
+  type="text"
+  id="workLocation"
+  name="workLocation"
+  value={formData.workLocation}
+  onChange={handleInputChange}
+  className={`mt-1 block w-full rounded-md ${
+    darkMode
+      ? 'bg-gray-700 border-gray-600 text-white'
+      : 'bg-white border-gray-300 text-gray-900'
+  } shadow-sm focus:border-red-500 focus:ring-red-500`}
+  required
+  aria-required="true"
+/>
+
                       </div>
                       <div>
                         <label
                           htmlFor="annualIncome"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          Annual Income
+                          Annual Income <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <select
                           id="annualIncome"
@@ -1350,6 +1420,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         >
                           <option value="">Select Annual Income</option>
                           <option value="0-3">Below 3 LPA</option>
@@ -1436,7 +1508,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="idVerificationType"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          ID Type
+                          ID Type <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <select
                           id="idVerificationType"
@@ -1448,6 +1520,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         >
                           <option value="">Select</option>
                           <option value="aadhar">Aadhar Card</option>
@@ -1461,7 +1535,7 @@ export default function MatrimonyRegistration() {
                           htmlFor="idVerificationNumber"
                           className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                         >
-                          ID Number
+                          ID Number <span className="text-red-500" aria-hidden="true">*</span>
                         </label>
                         <input
                           type="text"
@@ -1474,6 +1548,8 @@ export default function MatrimonyRegistration() {
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          required
+                          aria-required="true"
                         />
                       </div>
                     </>

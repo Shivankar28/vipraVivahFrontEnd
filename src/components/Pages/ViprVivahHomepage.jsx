@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Home, MessageSquare, Moon, Sun, Play, Heart, ArrowRight, Search, User, LogOut } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
-import Image2 from '../../../assets/images/img1.jpg';
+import Image2 from '../../../assets/viprvahHome.png';
 
 const ViprVivahHomepage = () => {
   const { darkMode, toggleDarkMode } = useTheme();

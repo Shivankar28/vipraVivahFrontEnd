@@ -361,11 +361,11 @@ console.log("selected profile",selectedProfile)
                     <Users className="w-5 h-5 mr-2" />
                     <span>Lives with Family: {profile.family.livesWithFamily}</span>
                   </div>
-                  <div>
+                  {/* <div>
                     <p>Father Occupation: {profile.family.fatherOccupation}</p>
                     <p>Mother Occupation: {profile.family.motherOccupation}</p>
                     <p>Siblings: {profile.family.siblings}</p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -421,7 +421,7 @@ console.log("selected profile",selectedProfile)
             </div>
 
             {/* Verification */}
-            <div className={`mt-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 rounded-lg`}>
+            {/* <div className={`mt-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 rounded-lg`}>
               <h2 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                 Verification
               </h2>
@@ -435,20 +435,20 @@ console.log("selected profile",selectedProfile)
                   <span>ID Number: {profile.idVerification.number}</span>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* About Me */}
-            <div className={`mt-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 rounded-lg`}>
+            {/* <div className={`mt-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 rounded-lg`}>
               <h2 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                 About Me
               </h2>
               <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 {profile.about}
               </p>
-            </div>
+            </div> */}
 
             {/* Partner Preferences */}
-            <div className={`mt-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 rounded-lg`}>
+            {/* <div className={`mt-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 rounded-lg`}>
               <h2 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                 Partner Preferences
               </h2>
@@ -462,7 +462,7 @@ console.log("selected profile",selectedProfile)
                   <p><strong>Location:</strong> {profile.preferences.location}</p>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Contact Information */}
             <div className={`mt-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-6 rounded-lg`}>
@@ -499,7 +499,7 @@ console.log("selected profile",selectedProfile)
             </div>
 
             {/* Action Buttons */}
-            <div className="mt-6 flex justify-center space-x-4">
+            {/* <div className="mt-6 flex justify-center space-x-4">
               <button className={`flex items-center px-6 py-3 rounded-lg ${
                 darkMode 
                   ? 'bg-red-500 hover:bg-red-600' 
@@ -516,7 +516,7 @@ console.log("selected profile",selectedProfile)
                 <MessageSquare className="w-5 h-5 mr-2" />
                 Send Message
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
