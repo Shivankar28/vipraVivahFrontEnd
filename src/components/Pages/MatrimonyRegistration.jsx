@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTheme } from '../../context/ThemeContext';
-import { HeartHandshake, Moon, Sun, Save, ArrowLeft, Upload, Camera } from 'lucide-react';
+import { HeartHandshake, Moon, Sun, Save, ArrowLeft, Upload, Camera, UserPlus, Sparkles, GraduationCap, Briefcase, Globe, Shield, Heart, Settings } from 'lucide-react';
 import { createUpdateProfile, getProfile } from '../../redux/slices/profileSlice';
 import { handleApiError } from '../../api/APIUtils';
 import { jwtDecode } from 'jwt-decode';
 import { Link } from 'react-router-dom';
+import { notifyProfileCreated, notifyProfileUpdated } from '../../utils/notificationUtils';
+import Header from '../Header';
+import Footer from '../Footer';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -29,6 +32,8 @@ const getSubtitle = (section) => {
       return 'Add your social media handles (optional)';
     case 'ID Verification':
       return 'Help us verify your identity';
+    case 'Preferences':
+      return 'Set your partner preferences for better matches';
     default:
       return '';
   }
@@ -38,6 +43,7 @@ export default function MatrimonyRegistration() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { darkMode, toggleDarkMode } = useTheme();
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true' && !!localStorage.getItem('token');
   const { profile, loading: reduxLoading, error: reduxError } = useSelector((state) => state.profile);
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
@@ -89,6 +95,47 @@ export default function MatrimonyRegistration() {
     linkedin: '',
     idVerificationType: '',
     idVerificationNumber: '',
+    profileForOther: '',
+    genderOther: '',
+    lookingForOther: '',
+    subCasteOther: '',
+    motherTongueOther: '',
+    
+    // Preferences Section
+    preferences: {
+      preferredAgeRange: { min: 18, max: 80 },
+      preferredHeight: { min: '', max: '' },
+      preferredEducation: [],
+      preferredOccupation: [],
+      preferredIncome: { min: '', max: '' },
+      preferredCities: [],
+      preferredStates: [],
+      preferredCountries: [],
+      preferredCaste: [],
+      preferredSubCaste: [],
+      preferredGotra: [],
+      preferredMotherTongue: [],
+      preferredMaritalStatus: [],
+      preferredFoodHabit: [],
+      preferredFamilyType: [],
+      preferredQualification: [],
+      preferredWorkLocation: [],
+      preferredCompanyType: [],
+      enableMatchNotifications: true,
+      notificationFrequency: 'immediate',
+      criteriaWeights: {
+        age: 20,
+        education: 15,
+        occupation: 15,
+        location: 20,
+        cultural: 20,
+        lifestyle: 10
+      },
+      matchThreshold: 70
+    },
+    highestQualificationOther: '',
+    specializationOther: '',
+    occupationOther: '',
   });
 
   useEffect(() => {
@@ -126,7 +173,10 @@ export default function MatrimonyRegistration() {
       dispatch(getProfile(token)).then((result) => {
         if (result.meta.requestStatus === 'fulfilled' && result.payload.data?.profile) {
           const profileData = result.payload.data.profile;
-          if (isDev) console.log('Profile fetched:', profileData);
+          if (isDev) {
+            console.log('Profile fetched:', profileData);
+            console.log('Profile data keys:', Object.keys(profileData));
+          }
           setFormData((prev) => ({
             ...prev,
             profileFor: profileData.profileFor || '',
@@ -138,7 +188,7 @@ export default function MatrimonyRegistration() {
             fatherName: profileData.fatherName || '',
             motherName: profileData.motherName || '',
             dateOfBirth: profileData.dateOfBirth ? profileData.dateOfBirth.split('T')[0] : '',
-            subCaste: profileData.subcaste || '',
+            subCaste: profileData.subCaste || '',
             gotra: profileData.gotra || '',
             motherTongue: profileData.motherTongue || '',
             lookingFor: profileData.lookingFor || '',
@@ -158,21 +208,21 @@ export default function MatrimonyRegistration() {
             },
             isLivesWithFamily: profileData.isLivesWithFamily || null,
             maritalStatus: profileData.maritalStatus || '',
-            foodHabit: profileData.foodHabits || '',
+            foodHabit: profileData.foodHabit || '',
             highestQualification: profileData.HighestQualification || '',
             specialization: profileData.specialization || '',
-            university: profileData.university || '',
+            university: profileData.universityCollege || '',
             yearOfCompletion: profileData.yearOfCompletion || '',
             currentWorking: profileData.currentWorking || null,
             occupation: profileData.occupation || '',
             company: profileData.company || '',
             workLocation: profileData.workLocation || '',
             annualIncome: profileData.annualIncome || '',
-            instagram: profileData.instagram || '',
-            facebook: profileData.facebook || '',
-            linkedin: profileData.linkedin || '',
-            idVerificationType: profileData.idVerification?.type || '',
-            idVerificationNumber: profileData.idVerification?.number || '',
+            instagram: profileData.instaUrl || '',
+            facebook: profileData.facebookUrl || '',
+            linkedin: profileData.linkedinUrl || '',
+            idVerificationType: profileData.idCardName || '',
+            idVerificationNumber: profileData.idCardNo || '',
           }));
           if (profileData.profilePicture) {
             setProfileImagePreview(profileData.profilePicture);
@@ -194,7 +244,9 @@ export default function MatrimonyRegistration() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (isDev) console.group('MatrimonyRegistration: handleInputChange');
-    if (name.includes('.')) {
+    if (name.endsWith('Other')) {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    } else if (name.includes('.')) {
       const [parent, child] = name.split('.');
       setFormData((prev) => ({
         ...prev,
@@ -384,14 +436,80 @@ export default function MatrimonyRegistration() {
         throw new Error('Please specify if you live with family');
       }
 
+      const submitData = { ...formData };
+      if (submitData.profileFor === 'other') submitData.profileFor = submitData.profileForOther;
+      if (submitData.gender === 'other') submitData.gender = submitData.genderOther;
+      if (submitData.lookingFor === 'other') submitData.lookingFor = submitData.lookingForOther;
+      if (submitData.subCaste === 'other') submitData.subCaste = submitData.subCasteOther;
+      if (submitData.motherTongue === 'other') submitData.motherTongue = submitData.motherTongueOther;
+      if (submitData.highestQualification === 'other') submitData.highestQualification = submitData.highestQualificationOther;
+      if (submitData.specialization === 'other') submitData.specialization = submitData.specializationOther;
+      if (submitData.occupation === 'other') submitData.occupation = submitData.occupationOther;
+      
+      // Map form fields to backend field names
+      const backendData = {
+        ...submitData,
+        subCaste: submitData.subCaste, // Keep as is
+        foodHabit: submitData.foodHabit, // Keep as is
+        universityCollege: submitData.university, // Map university to universityCollege
+        instaUrl: submitData.instagram, // Map instagram to instaUrl
+        facebookUrl: submitData.facebook, // Map facebook to facebookUrl
+        linkedinUrl: submitData.linkedin, // Map linkedin to linkedinUrl
+        idCardName: submitData.idVerificationType, // Map idVerificationType to idCardName
+        idCardNo: submitData.idVerificationNumber, // Map idVerificationNumber to idCardNo
+      };
+      
+      // Remove the old field names to avoid confusion
+      delete backendData.university;
+      delete backendData.instagram;
+      delete backendData.facebook;
+      delete backendData.linkedin;
+      delete backendData.idVerificationType;
+      delete backendData.idVerificationNumber;
+
+      if (isDev) {
+        console.log('Submitting backend data:', backendData);
+        console.log('Backend data keys:', Object.keys(backendData));
+      }
+
       const result = await dispatch(
-        createUpdateProfile({ token, profileData: formData, profilePhoto: profileImage })
+        createUpdateProfile({ token, profileData: backendData, profilePhoto: profileImage })
       ).unwrap();
       if (result.data?.profile) {
         if (isDev) console.log('Profile saved successfully:', result);
         localStorage.setItem('registrationComplete', 'true');
         localStorage.setItem('isProfileFlag', 'true');
         localStorage.removeItem('isNewUser');
+        
+        // Save preferences if they exist
+        if (formData.preferences) {
+          try {
+            const preferencesResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.vipravivah.in'}/api/preferences`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(formData.preferences)
+            });
+            
+            if (preferencesResponse.ok) {
+              if (isDev) console.log('Preferences saved successfully');
+            } else {
+              if (isDev) console.warn('Failed to save preferences, but profile was saved');
+            }
+          } catch (prefError) {
+            if (isDev) console.warn('Error saving preferences:', prefError);
+          }
+        }
+        
+        // Trigger appropriate notification based on whether it's a new profile or update
+        if (isProfileFlag) {
+          notifyProfileUpdated();
+        } else {
+          notifyProfileCreated();
+        }
+        
         navigate('/explore', { replace: true });
       } else {
         throw new Error(result.message || 'Failed to save profile');
@@ -427,81 +545,68 @@ export default function MatrimonyRegistration() {
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'} pb-12`}>
-      <header className="w-full fixed top-0 left-0 z-10 bg-opacity-95 backdrop-blur-sm shadow-sm">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex justify-between items-center relative">
-            <button
-              onClick={() => navigate('/')}
-              className={`flex items-center space-x-2 ${
-                darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-700'
-              } transition-colors duration-200`}
-              aria-label="Go back"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Back</span>
-            </button>
-            <Link to="/" className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-2">
-              <HeartHandshake className={`w-8 h-8 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
-              <span className="flex items-baseline">
-                <span
-                  className={`text-3xl font-extrabold tracking-tight ${
-                    darkMode ? 'text-white' : 'text-gray-900'
-                  } mr-1`}
-                >
-                  विप्रVivah
-                </span>
-              </span>
-            </Link>
-            <button
-              onClick={toggleDarkMode}
-              className={`p-2 rounded-full transition-all duration-200 ${
-                darkMode
-                  ? 'bg-gray-800 hover:bg-gray-700 text-yellow-400 hover:text-yellow-300'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900'
-              }`}
-              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {darkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
-            </button>
-          </div>
-        </div>
-      </header>
-      <main className="container mx-auto px-6 pt-24 pb-12">
-        <div
-          className={`max-w-5xl mx-auto ${
-            darkMode ? 'bg-gray-800/50' : 'bg-white'
-          } rounded-xl shadow-xl backdrop-blur-sm border ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}
-        >
-          <div
-            className={`px-10 py-8 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
-          >
-            <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              {isProfileFlag ? 'Edit My Profile' : 'Create My Profile'}
-            </h1>
-            <p className={`mt-3 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              Fill in your details to {isProfileFlag ? 'update' : 'create'} your matrimony profile. Fields
-              marked with <span className="text-red-500">*</span> are required.
-            </p>
-          </div>
-          {(formError || reduxError) && (
-            <div className="px-10 pt-6">
-              <div className="p-4 rounded-lg bg-red-100 text-red-600 text-sm" role="alert">
-                {formError || handleApiError(reduxError)}
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      {/* Header */}
+      <Header showAllLinks={true} isLoggedIn={isLoggedIn} />
+
+      {/* Hero Section */}
+      <section className={`relative overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-red-50 via-pink-50 to-orange-50'}`}>
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-pink-500/5"></div>
+        <div className="container mx-auto px-4 py-16 relative z-10">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="flex justify-center mb-6">
+              <div className={`p-4 rounded-full ${darkMode ? 'bg-red-500/20' : 'bg-red-500/10'} shadow-lg`}>
+                <UserPlus className={`w-12 h-12 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
               </div>
             </div>
-          )}
-          <form onSubmit={handleSubmit} className="p-10 space-y-12" aria-label="Profile registration form">
+            <h1 className={`text-5xl md:text-6xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'} leading-tight`}>
+              {isProfileFlag ? 'Edit My Profile' : 'Create My Profile'}
+            </h1>
+            <p className={`text-xl md:text-2xl ${darkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
+              Fill in your details to {isProfileFlag ? 'update' : 'create'} your matrimony profile. 
+              Fields marked with <span className="text-red-500 font-semibold">*</span> are required.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <section className="py-16">
+                  <div
+            className={`max-w-5xl mx-auto ${
+              darkMode ? 'bg-gray-800/50' : 'bg-white'
+            } rounded-3xl shadow-2xl backdrop-blur-sm border ${darkMode ? 'border-gray-700' : 'border-gray-100'} overflow-hidden`}
+          >
+            {(formError || reduxError) && (
+              <div className="p-6">
+                <div className={`p-6 rounded-3xl ${darkMode ? 'bg-red-500/20' : 'bg-red-100'} ${darkMode ? 'text-red-400' : 'text-red-600'} border ${darkMode ? 'border-red-500/30' : 'border-red-200'}`} role="alert">
+                  {formError || handleApiError(reduxError)}
+                </div>
+              </div>
+            )}
+                      <form onSubmit={handleSubmit} className="p-10 space-y-12" aria-label="Profile registration form">
             <section
-              className={`flex flex-col items-center space-y-6 pb-12 border-b ${
+              className={`flex flex-col items-center space-y-8 pb-12 border-b ${
                 darkMode ? 'border-gray-700' : 'border-gray-200'
               }`}
               aria-label="Profile photo upload"
             >
+              <div className="text-center mb-6">
+                <div className={`p-4 rounded-full ${darkMode ? 'bg-red-500/20' : 'bg-red-100'} inline-block mb-4`}>
+                  <Camera className={`w-8 h-8 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
+                </div>
+                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Profile Photo
+                </h3>
+                <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  Upload a clear, professional photo
+                </p>
+              </div>
+              
               <div
-                className={`w-48 h-48 rounded-full overflow-hidden border-4 ${
+                className={`w-48 h-48 rounded-3xl overflow-hidden border-4 ${
                   darkMode ? 'border-gray-700' : 'border-gray-200'
-                } shadow-lg hover:shadow-xl transition-shadow duration-300`}
+                } shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105`}
               >
                 {profileImagePreview ? (
                   <img
@@ -522,12 +627,13 @@ export default function MatrimonyRegistration() {
                   </div>
                 )}
               </div>
+              
               <label
-                className={`inline-flex items-center px-8 py-4 rounded-lg cursor-pointer ${
+                className={`inline-flex items-center px-8 py-4 rounded-2xl cursor-pointer ${
                   darkMode
                     ? 'bg-red-500 hover:bg-red-600 text-white'
                     : 'bg-red-500 hover:bg-red-600 text-white'
-                } transition-all duration-200 shadow-md hover:shadow-lg`}
+                } transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105`}
               >
                 <input
                   type="file"
@@ -535,13 +641,14 @@ export default function MatrimonyRegistration() {
                   onChange={handleImageChange}
                   className="hidden"
                   aria-label="Upload profile photo"
-                  required={!profileImagePreview} // Required if no image is already set
+                  required={!profileImagePreview}
                 />
                 <Upload className="w-5 h-5 mr-3" aria-hidden="true" />
-                <span className="text-lg">Upload Profile Photo <span className="text-red-200">*</span></span>
+                <span className="text-lg font-semibold">Upload Profile Photo <span className="text-red-200">*</span></span>
               </label>
+              
               <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                Maximum file size: 5MB. Only JPEG/PNG allowed. <span className="text-red-500">*Required</span>
+                Maximum file size: 5MB. Only JPEG/PNG allowed. <span className="text-red-500 font-semibold">*Required</span>
               </p>
             </section>
             {[
@@ -553,6 +660,7 @@ export default function MatrimonyRegistration() {
               'Career Details',
               'Social Media Profiles',
               ...(isProfileFlag ? [] : ['ID Verification']), // Conditionally include ID Verification
+              'Preferences',
             ].map((section, index) => (
               <section
                 key={index}
@@ -561,13 +669,28 @@ export default function MatrimonyRegistration() {
                 } ${darkMode ? 'hover:bg-gray-800/30' : 'hover:bg-gray-50'} rounded-lg transition-colors duration-200 p-6`}
                 aria-label={section}
               >
-                <div className="space-y-2">
-                  <h2 className={`text-2xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {section}
-                  </h2>
-                  <p className={`text-base ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {getSubtitle(section)}
-                  </p>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <div className={`p-3 rounded-full ${darkMode ? 'bg-red-500/20' : 'bg-red-100'}`}>
+                      {section === 'Profile For Section' && <UserPlus className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'Basic Information' && <UserPlus className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'Family Information' && <Heart className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'Personal Details' && <Sparkles className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'Education Details' && <GraduationCap className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'Career Details' && <Briefcase className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'Social Media Profiles' && <Globe className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'ID Verification' && <Shield className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+      {section === 'Preferences' && <Settings className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                    </div>
+                    <div>
+                      <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {section}
+                      </h2>
+                      <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        {getSubtitle(section)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {section === 'Profile For Section' && (
@@ -600,6 +723,17 @@ export default function MatrimonyRegistration() {
                           <option value="sister">Sister</option>
                           <option value="other">Other</option>
                         </select>
+                        {formData.profileFor === 'other' && (
+                          <input
+                            type="text"
+                            name="profileForOther"
+                            value={formData.profileForOther}
+                            onChange={handleInputChange}
+                            placeholder="Please specify"
+                            className={`mt-2 block w-full rounded-md ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} shadow-sm focus:border-red-500 focus:ring-red-500`}
+                            required
+                          />
+                        )}
                       </div>
                       <div>
                         <label
@@ -626,6 +760,17 @@ export default function MatrimonyRegistration() {
                           <option value="female">Female</option>
                           <option value="other">Other</option>
                         </select>
+                        {formData.gender === 'other' && (
+                          <input
+                            type="text"
+                            name="genderOther"
+                            value={formData.genderOther}
+                            onChange={handleInputChange}
+                            placeholder="Please specify"
+                            className={`mt-2 block w-full rounded-md ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} shadow-sm focus:border-red-500 focus:ring-red-500`}
+                            required
+                          />
+                        )}
                       </div>
                       <div>
                         <label
@@ -652,6 +797,17 @@ export default function MatrimonyRegistration() {
                           <option value="female">Female</option>
                           <option value="other">Other</option>
                         </select>
+                        {formData.lookingFor === 'other' && (
+                          <input
+                            type="text"
+                            name="lookingForOther"
+                            value={formData.lookingForOther}
+                            onChange={handleInputChange}
+                            placeholder="Please specify"
+                            className={`mt-2 block w-full rounded-md ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} shadow-sm focus:border-red-500 focus:ring-red-500`}
+                            required
+                          />
+                        )}
                       </div>
                     </>
                   )}
@@ -911,6 +1067,17 @@ export default function MatrimonyRegistration() {
                           <option value="gaud_saraswat">Gaud Saraswat</option>
                           <option value="other">Other</option>
                         </select>
+                        {formData.subCaste === 'other' && (
+                          <input
+                            type="text"
+                            name="subCasteOther"
+                            value={formData.subCasteOther}
+                            onChange={handleInputChange}
+                            placeholder="Please specify"
+                            className={`mt-2 block w-full rounded-md ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} shadow-sm focus:border-red-500 focus:ring-red-500`}
+                            required
+                          />
+                        )}
                       </div>
                       <div>
                         <label
@@ -966,6 +1133,17 @@ export default function MatrimonyRegistration() {
                           <option value="malayalam">Malayalam</option>
                           <option value="other">Other</option>
                         </select>
+                        {formData.motherTongue === 'other' && (
+                          <input
+                            type="text"
+                            name="motherTongueOther"
+                            value={formData.motherTongueOther}
+                            onChange={handleInputChange}
+                            placeholder="Please specify"
+                            className={`mt-2 block w-full rounded-md ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} shadow-sm focus:border-red-500 focus:ring-red-500`}
+                            required
+                          />
+                        )}
                       </div>
                       <div>
                         <label
@@ -1203,6 +1381,17 @@ export default function MatrimonyRegistration() {
                           <option value="phd">Ph.D.</option>
                           <option value="other">Other</option>
                         </select>
+                        {formData.highestQualification === 'other' && (
+                          <input
+                            type="text"
+                            name="highestQualificationOther"
+                            value={formData.highestQualificationOther}
+                            onChange={handleInputChange}
+                            placeholder="Please specify"
+                            className={`mt-2 block w-full rounded-md ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} shadow-sm focus:border-red-500 focus:ring-red-500`}
+                            required
+                          />
+                        )}
                       </div>
                       <div>
                         <label
@@ -1237,6 +1426,17 @@ export default function MatrimonyRegistration() {
                           <option value="management">Management</option>
                           <option value="other">Other</option>
                         </select>
+                        {formData.specialization === 'other' && (
+                          <input
+                            type="text"
+                            name="specializationOther"
+                            value={formData.specializationOther}
+                            onChange={handleInputChange}
+                            placeholder="Please specify"
+                            className={`mt-2 block w-full rounded-md ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} shadow-sm focus:border-red-500 focus:ring-red-500`}
+                            required
+                          />
+                        )}
                       </div>
                       <div>
                         <label
@@ -1359,6 +1559,17 @@ export default function MatrimonyRegistration() {
                           <option value="government_employee">Government Employee</option>
                           <option value="other">Other</option>
                         </select>
+                        {formData.occupation === 'other' && (
+                          <input
+                            type="text"
+                            name="occupationOther"
+                            value={formData.occupationOther}
+                            onChange={handleInputChange}
+                            placeholder="Please specify"
+                            className={`mt-2 block w-full rounded-md ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} shadow-sm focus:border-red-500 focus:ring-red-500`}
+                            required
+                          />
+                        )}
                       </div>
                       <div>
                         <label
@@ -1555,6 +1766,183 @@ export default function MatrimonyRegistration() {
                       </div>
                     </>
                   )}
+                  {section === 'Preferences' && (
+                    <>
+                      <div className="col-span-2">
+                        <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                          Partner Preferences
+                        </h3>
+                        <p className={`text-sm mb-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          Set your preferences to receive notifications when matching profiles are created.
+                        </p>
+                      </div>
+                      
+                      {/* Age Range */}
+                      <div>
+                        <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Preferred Age Range
+                        </label>
+                        <div className="flex space-x-4 mt-1">
+                          <input
+                            type="number"
+                            placeholder="Min Age"
+                            value={formData.preferences.preferredAgeRange.min || ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setFormData({
+                                ...formData,
+                                preferences: {
+                                  ...formData.preferences,
+                                  preferredAgeRange: {
+                                    ...formData.preferences.preferredAgeRange,
+                                    min: value === '' ? '' : parseInt(value) || 18
+                                  }
+                                }
+                              });
+                            }}
+                            className={`block w-full px-3 py-2 rounded-md ${
+                              darkMode
+                                ? 'bg-gray-700 border-gray-600 text-white'
+                                : 'bg-white border-gray-300 text-gray-900'
+                            } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                            min="18"
+                            max="80"
+                          />
+                          <input
+                            type="number"
+                            placeholder="Max Age"
+                            value={formData.preferences.preferredAgeRange.max || ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setFormData({
+                                ...formData,
+                                preferences: {
+                                  ...formData.preferences,
+                                  preferredAgeRange: {
+                                    ...formData.preferences.preferredAgeRange,
+                                    max: value === '' ? '' : parseInt(value) || 80
+                                  }
+                                }
+                              });
+                            }}
+                            className={`block w-full px-3 py-2 rounded-md ${
+                              darkMode
+                                ? 'bg-gray-700 border-gray-600 text-white'
+                                : 'bg-white border-gray-300 text-gray-900'
+                            } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                            min="18"
+                            max="80"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Education Preferences */}
+                      <div>
+                        <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Preferred Education
+                        </label>
+                        <select
+                          multiple
+                          value={formData.preferences.preferredEducation}
+                          onChange={(e) => {
+                            const selected = Array.from(e.target.selectedOptions, option => option.value);
+                            setFormData({
+                              ...formData,
+                              preferences: {
+                                ...formData.preferences,
+                                preferredEducation: selected
+                              }
+                            });
+                          }}
+                          className={`mt-1 block w-full px-3 py-2 rounded-md ${
+                            darkMode
+                              ? 'bg-gray-700 border-gray-600 text-white'
+                              : 'bg-white border-gray-300 text-gray-900'
+                          } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                        >
+                          <option value="High School">High School</option>
+                          <option value="Bachelor's Degree">Bachelor's Degree</option>
+                          <option value="Master's Degree">Master's Degree</option>
+                          <option value="PhD">PhD</option>
+                          <option value="Diploma">Diploma</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+
+                      {/* Location Preferences */}
+                      <div>
+                        <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Preferred Cities
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Enter cities separated by commas"
+                          value={formData.preferences.preferredCities.join(', ')}
+                          onChange={(e) => {
+                            const cities = e.target.value.split(',').map(city => city.trim()).filter(city => city);
+                            setFormData({
+                              ...formData,
+                              preferences: {
+                                ...formData.preferences,
+                                preferredCities: cities
+                              }
+                            });
+                          }}
+                          className={`mt-1 block w-full px-3 py-2 rounded-md ${
+                            darkMode
+                              ? 'bg-gray-700 border-gray-600 text-white'
+                              : 'bg-white border-gray-300 text-gray-900'
+                          } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                        />
+                      </div>
+
+                      {/* Match Threshold */}
+                      <div>
+                        <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Minimum Match Percentage
+                        </label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={formData.preferences.matchThreshold}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            preferences: {
+                              ...formData.preferences,
+                              matchThreshold: parseInt(e.target.value)
+                            }
+                          })}
+                          className={`mt-1 block w-full`}
+                        />
+                        <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          {formData.preferences.matchThreshold}%
+                        </span>
+                      </div>
+
+                      {/* Notification Settings */}
+                      <div className="col-span-2">
+                        <div className="flex items-center space-x-4">
+                          <input
+                            type="checkbox"
+                            id="enableMatchNotifications"
+                            checked={formData.preferences.enableMatchNotifications}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              preferences: {
+                                ...formData.preferences,
+                                enableMatchNotifications: e.target.checked
+                              }
+                            })}
+                            className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                          />
+                          <label htmlFor="enableMatchNotifications" className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Enable match notifications
+                          </label>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </section>
             ))}
@@ -1566,11 +1954,11 @@ export default function MatrimonyRegistration() {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className={`px-8 py-4 rounded-lg text-lg transition-all duration-200 ${
+                className={`px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300 ${
                   darkMode
                     ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                } shadow-sm hover:shadow-md`}
+                } shadow-lg hover:shadow-xl transform hover:scale-105`}
                 aria-label="Cancel and go back"
               >
                 Cancel
@@ -1578,13 +1966,13 @@ export default function MatrimonyRegistration() {
               <button
                 type="submit"
                 disabled={formLoading || reduxLoading}
-                className={`px-8 py-4 rounded-lg text-lg transition-all duration-200 flex items-center ${
+                className={`px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300 flex items-center ${
                   formLoading || reduxLoading
                     ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
                     : darkMode
                     ? 'bg-red-500 text-white hover:bg-red-600'
                     : 'bg-red-500 text-white hover:bg-red-600'
-                } shadow-sm hover:shadow-md`}
+                } shadow-lg hover:shadow-xl transform hover:scale-105`}
                 aria-label="Save profile"
               >
                 <Save className="w-5 h-5 mr-2" aria-hidden="true" />
@@ -1593,7 +1981,10 @@ export default function MatrimonyRegistration() {
             </div>
           </form>
         </div>
-      </main>
+      </section>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

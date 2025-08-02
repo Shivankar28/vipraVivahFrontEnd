@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ArrowLeft, Mail, Home, HeartHandshake, Moon, Sun } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { verifyOtp, resendOtp } from '../../redux/slices/authSlice';
+import Footer from '../Footer';
+import Header from '../Header';
 
 // Utility to check if in development mode
 const isDev = process.env.NODE_ENV === 'development';
@@ -138,152 +140,107 @@ export default function OTPVerification() {
   }, [resendCooldown]);
 
   return (
-    <div className={`flex flex-col items-center justify-center min-h-screen ${
-      darkMode ? 'bg-gray-900' : 'bg-gray-50'
-    }`}>
-      {/* Header with Logo and Dark Mode Toggle */}
-      <div className="w-full fixed top-0 left-0">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex justify-between items-center relative">
-            {/* Back to Login Link - Left */}
-            <Link 
-              to="/login" 
-              className={`flex items-center ${
-                darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-700'
-              } transition-colors duration-200`}
-            >
-              <ArrowLeft className="w-5 h-5 mr-1" />
-              <span>Back</span>
-            </Link>
+    <>
+      {/* Header Component */}
+      <Header showAllLinks={false} isLoggedIn={false} />
+      
+      <div className={`flex flex-col items-center justify-center min-h-screen ${
+        darkMode ? 'bg-gray-900' : 'bg-gray-50'
+      }`}>
+        {/* Back to Homepage Button - Fixed at Bottom */}
+        <Link
+          to="/"
+          className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 px-6 py-3 rounded-full shadow-lg ${
+            darkMode 
+              ? 'bg-gray-800 text-white hover:bg-gray-700' 
+              : 'bg-white text-red-500 hover:bg-gray-100'
+          } transition-all duration-200 hover:shadow-xl`}
+        >
+          <Home className="w-5 h-5" />
+          <span>Back to Homepage</span>
+        </Link>
 
-            {/* Logo - Center */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-2">
-              <HeartHandshake className={`w-8 h-8 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
-              <span className="flex items-baseline">
-                <span className={`text-3xl font-extrabold tracking-tight ${
-                  darkMode ? 'text-white' : 'text-gray-900'
-                } mr-1`}>
-                  विप्रVivah
-                </span>
-              </span>
+        {/* Add margin top to account for fixed header */}
+        <div className="mt-24">
+          <div className={`${
+            darkMode ? 'bg-gray-800' : 'bg-white'
+          } rounded-lg shadow-lg p-8 w-full max-w-md mx-4 transition-colors duration-200`}>
+            <h1 className={`text-2xl font-bold text-center mb-6 ${
+              darkMode ? 'text-white' : 'text-gray-900'
+            }`}>
+              Verify OTP
+            </h1>
+
+            {/* Instructions */}
+            <p className={`text-center mb-6 ${
+              darkMode ? 'text-gray-300' : 'text-gray-600'
+            }`}>
+              Enter the 6-digit OTP sent to {email}
+            </p>
+
+            {/* Error Message */}
+            {(error || authError) && (
+              <div className="mb-4 p-3 rounded-lg bg-red-100 text-red-600 text-sm">
+                {error || authError}
+              </div>
+            )}
+
+            {/* Success Message for Resend */}
+            {resendMessage && (
+              <div className="mb-4 p-3 rounded-lg bg-green-100 text-green-600 text-sm">
+                {resendMessage}
+              </div>
+            )}
+
+            {/* OTP Input */}
+            <div className="mb-6 relative">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                <Mail className={`w-5 h-5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+              </div>
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                className={`w-full pl-10 pr-4 py-3 rounded-lg border ${
+                  darkMode 
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                } focus:outline-none focus:ring-2 focus:ring-red-500`}
+                value={otp}
+                onChange={handleOtpChange}
+                maxLength={6}
+                required
+              />
             </div>
 
-            {/* Dark Mode Toggle - Right */}
+            {/* Verify Button */}
             <button
-              onClick={() => {
-                if (isDev) {
-                  console.group('OTPVerification: Toggle Dark Mode');
-                  console.log('Current Dark Mode:', darkMode);
-                  console.groupEnd();
-                }
-                toggleDarkMode();
-              }}
-              className={`p-2 rounded-full ${
-                darkMode 
-                  ? 'bg-gray-800 hover:bg-gray-700' 
-                  : 'bg-gray-100 hover:bg-gray-200'
-              } transition-colors duration-200`}
+              onClick={handleVerifyOtp}
+              disabled={loading}
+              className={`w-full bg-red-500 text-white py-3 rounded-lg transition-colors mb-4 ${
+                loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-red-600'
+              }`}
             >
-              {darkMode ? (
-                <Sun className="w-6 h-6 text-yellow-400" />
-              ) : (
-                <Moon className="w-6 h-6 text-gray-700" />
-              )}
+              {loading ? 'Verifying...' : 'Verify OTP'}
             </button>
+
+            {/* Resend OTP Button */}
+            <div className="text-center">
+              <button
+                onClick={handleResendOtp}
+                disabled={loading || resendCooldown > 0}
+                className={`text-sm ${
+                  darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-700'
+                } transition-colors ${resendCooldown > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                {resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : 'Resend OTP'}
+              </button>
+            </div>
           </div>
         </div>
+        
+        {/* Footer */}
+        <Footer />
       </div>
-
-      {/* Back to Homepage Button - Fixed at Bottom */}
-      <Link
-        to="/"
-        className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 px-6 py-3 rounded-full shadow-lg ${
-          darkMode 
-            ? 'bg-gray-800 text-white hover:bg-gray-700' 
-            : 'bg-white text-red-500 hover:bg-gray-100'
-        } transition-all duration-200 hover:shadow-xl`}
-      >
-        <Home className="w-5 h-5" />
-        <span>Back to Homepage</span>
-      </Link>
-
-      {/* Add margin top to account for fixed header */}
-      <div className="mt-24">
-        <div className={`${
-          darkMode ? 'bg-gray-800' : 'bg-white'
-        } rounded-lg shadow-lg p-8 w-full max-w-md mx-4 transition-colors duration-200`}>
-          <h1 className={`text-2xl font-bold text-center mb-6 ${
-            darkMode ? 'text-white' : 'text-gray-900'
-          }`}>
-            Verify OTP
-          </h1>
-
-          {/* Instructions */}
-          <p className={`text-center mb-6 ${
-            darkMode ? 'text-gray-300' : 'text-gray-600'
-          }`}>
-            Enter the 6-digit OTP sent to {email}
-          </p>
-
-          {/* Error Message */}
-          {(error || authError) && (
-            <div className="mb-4 p-3 rounded-lg bg-red-100 text-red-600 text-sm">
-              {error || authError}
-            </div>
-          )}
-
-          {/* Success Message for Resend */}
-          {resendMessage && (
-            <div className="mb-4 p-3 rounded-lg bg-green-100 text-green-600 text-sm">
-              {resendMessage}
-            </div>
-          )}
-
-          {/* OTP Input */}
-          <div className="mb-6 relative">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <Mail className={`w-5 h-5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
-            </div>
-            <input
-              type="text"
-              placeholder="Enter OTP"
-              className={`w-full pl-10 pr-4 py-3 rounded-lg border ${
-                darkMode 
-                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-              } focus:outline-none focus:ring-2 focus:ring-red-500`}
-              value={otp}
-              onChange={handleOtpChange}
-              maxLength={6}
-              required
-            />
-          </div>
-
-          {/* Verify Button */}
-          <button
-            onClick={handleVerifyOtp}
-            disabled={loading}
-            className={`w-full bg-red-500 text-white py-3 rounded-lg transition-colors mb-4 ${
-              loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-red-600'
-            }`}
-          >
-            {loading ? 'Verifying...' : 'Verify OTP'}
-          </button>
-
-          {/* Resend OTP Button */}
-          <div className="text-center">
-            <button
-              onClick={handleResendOtp}
-              disabled={loading || resendCooldown > 0}
-              className={`text-sm ${
-                darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-700'
-              } transition-colors ${resendCooldown > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              {resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : 'Resend OTP'}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }

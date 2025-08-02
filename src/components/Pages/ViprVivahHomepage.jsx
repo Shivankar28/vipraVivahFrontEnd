@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, MessageSquare, Moon, Sun, Play, Heart, ArrowRight, Search, User, LogOut } from 'lucide-react';
+import { ArrowRight, UserPlus, Shield, Users, Star, Heart, User, Search } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { notifyCustom, NotificationTypes } from '../../utils/notificationUtils';
 import Image2 from '../../../assets/viprvahHome.png';
+import Header from '../Header';
+import Footer from '../Footer';
 
 const ViprVivahHomepage = () => {
   const { darkMode, toggleDarkMode } = useTheme();
@@ -22,87 +25,10 @@ const ViprVivahHomepage = () => {
     navigate('/login');
   };
 
-  // Header for logged-in users (same as ExploreProfiles)
-  const renderLoggedInHeader = () => (
-    <nav className={`${darkMode ? 'bg-gray-800' : 'bg-red-500'} text-white p-4 fixed w-full z-10`}>
-      <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="flex items-center space-x-2">
-          <Heart className="w-8 h-8" />
-          <span className="text-2xl font-bold">विप्रVivah</span>
-        </Link>
-        <div className="flex items-center space-x-6">
-          <Link to="/" className="flex items-center hover:text-gray-200 transition-colors">
-            <Home className="w-5 h-5 mr-1" />
-            <span>Home</span>
-          </Link>
-          <Link to="/explore" className="flex items-center hover:text-gray-200 transition-colors">
-            <Search className="w-5 h-5 mr-1" />
-            <span>Explore</span>
-          </Link>
-          <Link to="/contact" className="flex items-center hover:text-gray-200 transition-colors">
-            <MessageSquare className="w-5 h-5 mr-1" />
-            <span>Contact</span>
-          </Link>
-          <Link to="/profile" className="flex items-center hover:text-gray-200 transition-colors">
-            <User className="w-5 h-5 mr-1" />
-            <span>My Profile</span>
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="flex items-center hover:text-gray-200 transition-colors"
-          >
-            <LogOut className="w-5 h-5 mr-1" />
-            <span>Logout</span>
-          </button>
-          <button
-            onClick={toggleDarkMode}
-            className="p-2 rounded-full hover:bg-white/10 transition-colors"
-            aria-label="Toggle dark mode"
-          >
-            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </button>
-        </div>
-      </div>
-    </nav>
-  );
-
-  // Header for non-logged-in users (original homepage header)
-  const renderNonLoggedInHeader = () => (
-    <nav className={`${darkMode ? 'bg-gray-800/90' : 'bg-red-500/90'} text-white p-4 fixed w-full z-50 transition-colors duration-200 backdrop-blur-sm`}>
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="flex items-center">
-          <Heart className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-white'} mr-2`} />
-          <Link to="/" className="text-2xl font-bold">विप्रVivah</Link>
-        </div>
-        <div className="flex items-center space-x-6">
-          <Link to="/" className="flex items-center hover:text-gray-200 transition-colors">
-            <Home size={18} className="mr-1" />
-            <span>Home</span>
-          </Link>
-          <Link to="/contact" className="flex items-center hover:text-gray-200 transition-colors">
-            <MessageSquare size={18} className="mr-1" />
-            <span>Contact</span>
-          </Link>
-        </div>
-        <button
-          onClick={toggleDarkMode}
-          className="p-2 rounded-full hover:bg-white/10 transition-colors"
-          aria-label="Toggle dark mode"
-        >
-          {darkMode ? (
-            <Sun size={20} className="text-yellow-300" />
-          ) : (
-            <Moon size={20} className="text-white" />
-          )}
-        </button>
-      </div>
-    </nav>
-  );
-
   return (
     <div className={`flex flex-col min-h-screen ${darkMode ? 'dark' : ''}`}>
-      {/* Conditional Header */}
-      {isLoggedIn ? renderLoggedInHeader() : renderNonLoggedInHeader()}
+      {/* Header */}
+      <Header showAllLinks={true} isLoggedIn={isLoggedIn} />
 
       {/* Hero Section */}
       <div className="relative h-screen w-full overflow-hidden">
@@ -115,15 +41,18 @@ const ViprVivahHomepage = () => {
             backfaceVisibility: 'hidden',
           }}
         />
-        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/40"></div>
         <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
-          <div className="max-w-4xl mx-auto space-y-8">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 drop-shadow-lg">
+          <div className="max-w-5xl mx-auto space-y-8">
+            <div className="space-y-4">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 drop-shadow-lg leading-tight">
               अखंड एवं विराट विप्र समाज को समर्पित
             </h1>
-            <p className="text-xl md:text-2xl text-white mb-8 drop-shadow-md max-w-2xl mx-auto">
+              <p className="text-xl md:text-2xl text-white mb-8 drop-shadow-md max-w-3xl mx-auto leading-relaxed">
               Find your perfect match in the Brahmin community with our trusted matrimonial service
             </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
               onClick={handleExploreClick}
               className={`inline-flex items-center px-8 py-4 text-lg font-medium rounded-full 
@@ -135,78 +64,198 @@ const ViprVivahHomepage = () => {
               <span className="mr-2">{isLoggedIn ? 'Explore Matches' : 'Let\'s Begin'}</span>
               <ArrowRight className="w-5 h-5" />
             </button>
+              {!isLoggedIn && (
+                <Link
+                  to="/login"
+                  className={`inline-flex items-center px-8 py-4 text-lg font-medium rounded-full border-2 border-white text-white hover:bg-white hover:text-red-500 transition-all duration-300 transform hover:scale-105`}
+                >
+                  <UserPlus className="w-5 h-5 mr-2" />
+                  <span>Create Account</span>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* About Us Section with Parallax */}
-      <section className={`relative py-20 ${darkMode ? 'bg-gray-800' : 'bg-white'} transition-colors duration-200`}>
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-fixed opacity-10"
-          style={{ backgroundImage: `url(${Image2})` }}
-        ></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} shadow-lg rounded-lg p-12 max-w-4xl mx-auto transition-colors duration-200`}>
-            <h2 className={`text-3xl md:text-4xl font-bold text-center ${darkMode ? 'text-white' : 'text-gray-800'} mb-8`}>
-              About Us
-              <div className={`h-1 w-24 ${darkMode ? 'bg-red-400' : 'bg-red-500'} mx-auto mt-4`}></div>
+      {/* Features Section */}
+      <section className={`py-20 pt-32 ${darkMode ? 'bg-gray-900' : 'bg-white'} transition-colors duration-200`}>
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+              Why Choose विप्रVivah?
             </h2>
-            <div className="max-w-3xl mx-auto text-center">
-              <p className={`text-lg leading-relaxed mb-8 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Welcome to <span className="font-bold">विप्रVivah</span>, a dedicated matchmaking platform for the Brahmin community. Our mission 
-                is to connect like-minded individuals and families, helping them find compatible partners while 
-                preserving cultural values. Through advanced technology and personalized services, we ensure a 
-                smooth and secure matchmaking experience.
+            <p className={`text-xl ${darkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto`}>
+              Experience the most trusted matrimonial platform designed specifically for the Brahmin community
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className={`text-center p-6 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-all duration-300 hover:transform hover:scale-105`}>
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${darkMode ? 'bg-red-500' : 'bg-red-500'} flex items-center justify-center`}>
+                <Shield className="w-8 h-8 text-white" />
+              </div>
+              <h3 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Secure & Private</h3>
+              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                Your privacy is our priority with advanced security measures
+              </p>
+            </div>
+            
+            <div className={`text-center p-6 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-all duration-300 hover:transform hover:scale-105`}>
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${darkMode ? 'bg-red-500' : 'bg-red-500'} flex items-center justify-center`}>
+                <Users className="w-8 h-8 text-white" />
+              </div>
+              <h3 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Verified Profiles</h3>
+              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                All profiles are verified to ensure authenticity
+              </p>
+            </div>
+            
+            <div className={`text-center p-6 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-all duration-300 hover:transform hover:scale-105`}>
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${darkMode ? 'bg-red-500' : 'bg-red-500'} flex items-center justify-center`}>
+                <Star className="w-8 h-8 text-white" />
+              </div>
+              <h3 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Premium Service</h3>
+              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                Advanced features for serious matchmaking
+              </p>
+            </div>
+            
+            <div className={`text-center p-6 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-all duration-300 hover:transform hover:scale-105`}>
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${darkMode ? 'bg-red-500' : 'bg-red-500'} flex items-center justify-center`}>
+                <Heart className="w-8 h-8 text-white" />
+              </div>
+              <h3 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Cultural Focus</h3>
+              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                Dedicated to preserving Brahmin cultural values
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How to Register Section with Parallax */}
-      <section className={`relative py-20 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-200`}>
+      {/* About Us Section with Parallax */}
+      <section className={`relative py-20 pt-32 ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-colors duration-200`}>
         <div
           className="absolute inset-0 bg-cover bg-center bg-fixed opacity-10"
           style={{ backgroundImage: `url(${Image2})` }}
         ></div>
         <div className="container mx-auto px-4 relative z-10">
-          <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg rounded-lg p-12 max-w-4xl mx-auto transition-colors duration-200`}>
-            <h2 className={`text-3xl md:text-4xl font-bold text-center ${darkMode ? 'text-white' : 'text-gray-800'} mb-8`}>
-              How to Register
+          <div className={`${darkMode ? 'bg-gray-700' : 'bg-white'} shadow-xl rounded-2xl p-12 max-w-4xl mx-auto transition-colors duration-200`}>
+            <h2 className={`text-3xl md:text-4xl font-bold text-center ${darkMode ? 'text-white' : 'text-gray-900'} mb-8`}>
+              About Us
               <div className={`h-1 w-24 ${darkMode ? 'bg-red-400' : 'bg-red-500'} mx-auto mt-4`}></div>
             </h2>
-            <p className={`text-center ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-10 text-lg`}>
-              Watch our quick guide to learn how to register and start your journey.
-            </p>
-            <div className="flex justify-center">
-              <button className={`${
-                darkMode ? 'bg-red-500 hover:bg-red-600' : 'bg-red-500 hover:bg-red-600'
-              } text-white rounded-full py-4 px-8 text-lg flex items-center transition-all shadow-md hover:shadow-lg transform hover:scale-105 duration-200`}>
-                <Play className="mr-2" size={24} />
-                Watch Guide
-              </button>
+            <div className="max-w-3xl mx-auto text-center">
+              <p className={`text-lg leading-relaxed mb-8 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                Welcome to <span className="font-bold text-red-500">विप्रVivah</span>, a dedicated matchmaking platform for the Brahmin community. Our mission 
+                is to connect like-minded individuals and families, helping them find compatible partners while 
+                preserving cultural values. Through advanced technology and personalized services, we ensure a 
+                smooth and secure matchmaking experience.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <div className={`text-center p-4 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-gray-100'}`}>
+                  <h4 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Trusted Platform</h4>
+                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Verified profiles and secure environment</p>
+                </div>
+                <div className={`text-center p-4 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-gray-100'}`}>
+                  <h4 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Cultural Values</h4>
+                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Preserving traditional values</p>
+                </div>
+                <div className={`text-center p-4 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-gray-100'}`}>
+                  <h4 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Success Stories</h4>
+                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Thousands of happy marriages</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className={`${darkMode ? 'bg-gray-800' : 'bg-gray-900'} text-white py-12 transition-colors duration-200`}>
+      {/* Registration Steps Section */}
+      <section className={`py-20 pt-32 ${darkMode ? 'bg-gray-900' : 'bg-white'} transition-colors duration-200`}>
         <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center text-center">
-            <div className="flex items-center mb-6">
-              <Heart className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'} mr-2`} />
-              <h3 className="text-2xl font-bold">विप्रVivah</h3>
-            </div>
-            <p className={`text-base leading-relaxed max-w-3xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-400'}`}>
-              The information provided on this website is solely the responsibility of the individual submitting it. 
-              We do not verify or guarantee the accuracy, completeness, or reliability of any data filled by users. 
-              Users and interested parties should exercise due diligence and independently verify all information 
-              before taking any action based on it.
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+              How to Get Started
+            </h2>
+            <p className={`text-xl ${darkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto`}>
+              Follow these simple steps to create your profile and start your journey
             </p>
           </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            <div className={`text-center p-6 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-all duration-300 hover:transform hover:scale-105`}>
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${darkMode ? 'bg-red-500' : 'bg-red-500'} flex items-center justify-center text-white text-2xl font-bold`}>
+                1
+              </div>
+              <h3 className={`text-xl font-semibold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Create Account</h3>
+              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
+                Sign up with your email and basic information
+              </p>
+              <div className="flex justify-center">
+                <UserPlus className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
+              </div>
+            </div>
+            
+            <div className={`text-center p-6 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-all duration-300 hover:transform hover:scale-105`}>
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${darkMode ? 'bg-red-500' : 'bg-red-500'} flex items-center justify-center text-white text-2xl font-bold`}>
+                2
+              </div>
+              <h3 className={`text-xl font-semibold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Complete Profile</h3>
+              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
+                Add detailed information about yourself and preferences
+              </p>
+              <div className="flex justify-center">
+                <User className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
+              </div>
+            </div>
+            
+            <div className={`text-center p-6 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-all duration-300 hover:transform hover:scale-105`}>
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${darkMode ? 'bg-red-500' : 'bg-red-500'} flex items-center justify-center text-white text-2xl font-bold`}>
+                3
+              </div>
+              <h3 className={`text-xl font-semibold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Explore Matches</h3>
+              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
+                Browse profiles and find your perfect match
+              </p>
+              <div className="flex justify-center">
+                <Search className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
+              </div>
+            </div>
+            
+            <div className={`text-center p-6 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-all duration-300 hover:transform hover:scale-105`}>
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${darkMode ? 'bg-red-500' : 'bg-red-500'} flex items-center justify-center text-white text-2xl font-bold`}>
+                4
+              </div>
+              <h3 className={`text-xl font-semibold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Connect & Meet</h3>
+              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
+                Express interest and start your journey together
+            </p>
+            <div className="flex justify-center">
+                <Heart className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-center mt-12 space-y-4">
+            <button
+              onClick={handleExploreClick}
+              className={`inline-flex items-center px-8 py-4 text-lg font-medium rounded-full ${
+                darkMode ? 'bg-red-500 hover:bg-red-600' : 'bg-red-500 hover:bg-red-600'
+              } text-white transition-all shadow-lg hover:shadow-xl transform hover:scale-105 duration-200`}
+            >
+              <span className="mr-2">Start Your Journey</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+            
+
+          </div>
         </div>
-      </footer>
+      </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

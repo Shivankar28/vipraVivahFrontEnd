@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import Footer from '../Footer';
 
 const RegistrationSuccess = () => {
   const navigate = useNavigate();
@@ -38,6 +39,9 @@ const RegistrationSuccess = () => {
           Explore Profiles
         </button>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

@@ -93,7 +93,7 @@ const APIConnector = {
   getProfile: (token) =>
     APIConnector.request({
       method: 'GET',
-      url: `${BASE_URL}/api/profile`,
+      url: `${BASE_URL}/api/auth/profile`,
       headers: { Authorization: `Bearer ${token}` },
     }),
 
@@ -109,6 +109,115 @@ const APIConnector = {
     APIConnector.request({
       method: 'GET',
       url: `${BASE_URL}/api/profile/${id}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  // Interest Endpoints
+  createLike: (token, likedId) =>
+    APIConnector.request({
+      method: 'POST',
+      url: `${BASE_URL}/api/interest/likes`,
+      data: { likedId },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    }),
+
+  unlike: (token, targetUserId) =>
+    APIConnector.request({
+      method: 'DELETE',
+      url: `${BASE_URL}/api/interest/likes`,
+      data: { targetUserId },
+
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  getUsersWhoLikedMe: (token) =>
+    APIConnector.request({
+      method: 'GET',
+      url: `${BASE_URL}/api/interest/likes/received`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  getUsersILiked: (token) =>
+    APIConnector.request({
+      method: 'GET',
+      url: `${BASE_URL}/api/interest/likes/sent`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  // Subscription Endpoints
+  upgradeToPremium: (token) =>
+    APIConnector.request({
+      method: 'POST',
+      url: `${BASE_URL}/api/subscription/upgrade`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  getSubscriptionStatus: (token) =>
+    APIConnector.request({
+      method: 'GET',
+      url: `${BASE_URL}/api/subscription/status`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  // Notification Endpoints
+  getNotifications: (token, params = {}) =>
+    APIConnector.request({
+      method: 'GET',
+      url: `${BASE_URL}/api/notifications`,
+      params,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  getUnreadCount: (token) =>
+    APIConnector.request({
+      method: 'GET',
+      url: `${BASE_URL}/api/notifications/unread-count`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  markNotificationsAsRead: (token, notificationIds = null) =>
+    APIConnector.request({
+      method: 'PATCH',
+      url: `${BASE_URL}/api/notifications/mark-read`,
+      data: { notificationIds },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    }),
+
+  deleteNotification: (token, notificationId) =>
+    APIConnector.request({
+      method: 'DELETE',
+      url: `${BASE_URL}/api/notifications/${notificationId}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  clearAllNotifications: (token) =>
+    APIConnector.request({
+      method: 'DELETE',
+      url: `${BASE_URL}/api/notifications`,
       headers: {
         Authorization: `Bearer ${token}`,
       },

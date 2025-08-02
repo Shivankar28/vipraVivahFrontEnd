@@ -1,46 +1,85 @@
+// components/ExploreProfiles.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Moon, 
-  Sun, 
-  Heart, 
-  Home, 
-  Mail, 
-  User, 
-  Filter, 
-  Search, 
-  X, 
-  Cake, 
-  Languages, 
-  MapPin, 
-  Users, 
-  LogOut 
+import {
+  Filter,
+  Search,
+  X,
+  Cake,
+  Languages,
+  MapPin,
+  Users,
+  Heart,
+  Eye,
+  Star,
+  ArrowRight,
+  Sparkles,
+  Bell,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { exploreProfiles } from '../../redux/slices/profileSlice';
+import { createLike, unlike, getUsersILiked } from '../../redux/slices/interestSlice';
+import { notifyProfileLiked, notifyMutualLike } from '../../utils/notificationUtils';
+import Header from '../Header';
+import Footer from '../Footer';
+import { addLocalNotification } from '../../redux/slices/notificationSlice';
+
+// Utility to check if in development mode
+const isDev = process.env.NODE_ENV === 'development';
 
 // Available options for filters
 const filterOptions = {
-  lookingFor: ["Any", "male", "female", "other"], // Adjusted to match backend gender values
-  languages: ["Any", "hindi", "marathi", "bengali", "tamil", "telugu", "kannada", "malayalam", "gujarati", "punjabi", "konkani", "other"],
-  cities: ["Any", "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune", "Jaipur", "Ahmedabad", "Vadodara", "Ghaziabad", "Other"],
-  gotras: ["Any", "kashyap", "vashishtha", "gautam", "bharadwaj", "atri", "agastya", "other"]
+  lookingFor: ['Any', 'male', 'female', 'other'],
+  languages: [
+    'Any',
+    'hindi',
+    'marathi',
+    'bengali',
+    'tamil',
+    'telugu',
+    'kannada',
+    'malayalam',
+    'gujarati',
+    'punjabi',
+    'konkani',
+    'other',
+  ],
+  cities: [
+    'Any',
+    'Mumbai',
+    'Delhi',
+    'Bangalore',
+    'Hyderabad',
+    'Chennai',
+    'Kolkata',
+    'Pune',
+    'Jaipur',
+    'Ahmedabad',
+    'Vadodara',
+    'Ghaziabad',
+    'Other',
+  ],
+  gotras: ['Any', 'kashyap', 'vashishtha', 'gautam', 'bharadwaj', 'atri', 'agastya', 'other'],
 };
 
 const ExploreProfiles = () => {
   const navigate = useNavigate();
   const { darkMode, toggleDarkMode } = useTheme();
   const dispatch = useDispatch();
-  
+
   // Get profiles, loading, and error from Redux store
   const { profiles, loading, error } = useSelector((state) => state.profile);
-  
+  const { iLiked, likeLoading, unlikeLoading, error: interestError } = useSelector((state) => state.interest);
+  const plan = useSelector((state) => state.subscription.plan);
+
+  if (isDev) console.log('ExploreProfiles: Redux state', { profiles: profiles.length, iLiked: iLiked.length, plan, interestError });
+
   const [filters, setFilters] = useState({
-    lookingFor: "Any",
-    language: "Any",
-    city: "Any",
-    gotra: "Any"
+    lookingFor: 'Any',
+    language: 'Any',
+    city: 'Any',
+    gotra: 'Any',
   });
 
   useEffect(() => {
@@ -48,240 +87,381 @@ const ExploreProfiles = () => {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     const token = localStorage.getItem('token');
     if (!isLoggedIn || !token) {
+      if (isDev) console.log('ExploreProfiles: User not logged in, redirecting to login');
       navigate('/login');
       return;
     }
-
     // Fetch profiles with current filters
+    if (isDev) console.log('ExploreProfiles: Fetching profiles with filters', filters);
     dispatch(exploreProfiles({ params: filters, token }));
+    // Fetch liked profiles
+    if (isDev) console.log('ExploreProfiles: Fetching liked profiles');
+    dispatch(getUsersILiked(token));
+    // Fetch subscription status
+    if (isDev) console.log('ExploreProfiles: Fetching subscription status');
+    dispatch({ type: 'subscription/getSubscriptionStatus/pending' });
   }, [navigate, dispatch, filters]);
 
   const handleLogout = () => {
+    if (isDev) console.log('ExploreProfiles: Logging out');
     localStorage.clear();
     navigate('/login');
   };
 
   const clearFilters = () => {
+    if (isDev) console.log('ExploreProfiles: Clearing filters');
     setFilters({
-      lookingFor: "Any",
-      language: "Any",
-      city: "Any",
-      gotra: "Any"
+      lookingFor: 'Any',
+      language: 'Any',
+      city: 'Any',
+      gotra: 'Any',
     });
   };
 
   const handleFilterChange = (filterName, value) => {
-    setFilters(prev => ({
+    if (isDev) console.log('ExploreProfiles: Filter changed', { filterName, value });
+    setFilters((prev) => ({
       ...prev,
-      [filterName]: value
+      [filterName]: value,
     }));
   };
-console.log("profiles",profiles)
-  return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
-      {/* Navigation Bar */}
-      <nav className={`${darkMode ? 'bg-gray-800' : 'bg-red-500'} text-white p-4 fixed w-full z-10`}>
-        <div className="container mx-auto flex justify-between items-center">
-          <Link to="/" className="flex items-center space-x-2">
-            <Heart className="w-8 h-8" />
-            <span className="text-2xl font-bold">विप्रVivah</span>
-          </Link>
 
-          <div className="flex items-center space-x-6">
-            <Link to="/" className="flex items-center hover:text-gray-200 transition-colors">
-              <Home className="w-5 h-5 mr-1" />
-              <span>Home</span>
-            </Link>
-            <Link to="/explore" className="flex items-center hover:text-gray-200 transition-colors">
-              <Search className="w-5 h-5 mr-1" />
-              <span>Explore</span>
-            </Link>
-            <Link to="/contact" className="flex items-center hover:text-gray-200 transition-colors">
-              <Mail className="w-5 h-5 mr-1" />
-              <span>Contact</span>
-            </Link>
-            <Link to="/profile" className="flex items-center hover:text-gray-200 transition-colors">
-              <User className="w-5 h-5 mr-1" />
-              <span>My Profile</span>
-            </Link>
-            <button 
-              onClick={handleLogout}
-              className="flex items-center hover:text-gray-200 transition-colors"
-            >
-              <LogOut className="w-5 h-5 mr-1" />
-              <span>Logout</span>
-            </button>
-            <button 
-              onClick={toggleDarkMode} 
-              className="p-2 rounded-full hover:bg-white/10 transition-colors"
-            >
-              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-      </nav>
+  const isProfileLiked = (profileId) => {
+    const liked = iLiked.some((p) => p._id === profileId);
+    if (isDev) console.log('ExploreProfiles: Checking if profile is liked', { profileId, liked, iLiked });
+    return liked;
+  };
 
-      <div className="container mx-auto py-8 px-4 pt-20">
-        {/* Filter Section */}
-        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6 mb-8`}>
-          <div className={`flex items-center ${darkMode ? 'text-red-400' : 'text-red-500'} text-xl font-bold mb-6`}>
-            <Filter className="mr-2" /> Filter Profiles
-          </div>
+  const handleLikeToggle = async (profileId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      if (isDev) console.log('ExploreProfiles: No token found');
+      navigate('/login');
+      return;
+    }
+
+    const alreadyLiked = isProfileLiked(profileId);
+    if (isDev) console.log('ExploreProfiles: Initiating like/unlike action', { profileId, alreadyLiked });
+
+    try {
+      if (alreadyLiked) {
+        await dispatch(unlike({ token, likedId: profileId })).unwrap();
+        if (isDev) console.log('ExploreProfiles: Unlike successful', { profileId });
+      } else {
+        await dispatch(createLike({ token, likedId: profileId })).unwrap();
+        if (isDev) console.log('ExploreProfiles: Like successful', { profileId });
+        
+        // Find the profile that was liked to get their name
+        const likedProfile = profiles.find(profile => profile._id === profileId);
+        if (likedProfile) {
+          const profileName = `${likedProfile.firstName} ${likedProfile.lastName}`;
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <label className={`flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-2`}>
-                <Search className="mr-2" size={16} /> Looking for
-              </label>
-              <select 
-                className={`w-full p-2 border rounded ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white' 
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
-                value={filters.lookingFor}
-                onChange={(e) => handleFilterChange('lookingFor', e.target.value)}
-              >
-                {filterOptions.lookingFor.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </div>
+          // Trigger notification for profile like
+          notifyProfileLiked(profileName, profileId);
+          
+          // Check if this creates a mutual like (both users liked each other)
+          // This would require checking if the other user has also liked the current user
+          // For now, we'll just show the basic like notification
+        }
+      }
+      // Refresh iLiked state only on success
+      await dispatch(getUsersILiked(token)).unwrap();
+      if (isDev) console.log('ExploreProfiles: Refreshed iLiked state', { iLiked });
+    } catch (error) {
+      if (isDev) console.error('ExploreProfiles: Like/unlike error', { profileId, error: error.message || error });
+    }
+  };
 
-            <div>
-              <label className={`flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-2`}>
-                <Languages className="mr-2" size={16} /> Mother Tongue
-              </label>
-              <select 
-                className={`w-full p-2 border rounded ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white' 
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
-                value={filters.language}
-                onChange={(e) => handleFilterChange('language', e.target.value)}
-              >
-                {filterOptions.languages.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </div>
+  return (
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      {/* Header */}
+      <Header showAllLinks={true} isLoggedIn={true} />
 
-            <div>
-              <label className={`flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-2`}>
-                <MapPin className="mr-2" size={16} /> City
-              </label>
-              <select 
-                className={`w-full p-2 border rounded ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white' 
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
-                value={filters.city}
-                onChange={(e) => handleFilterChange('city', e.target.value)}
-              >
-                {filterOptions.cities.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className={`flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-2`}>
-                <Users className="mr-2" size={16} /> Gotra
-              </label>
-              <select 
-                className={`w-full p-2 border rounded ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white' 
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
-                value={filters.gotra}
-                onChange={(e) => handleFilterChange('gotra', e.target.value)}
-              >
-                {filterOptions.gotras.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="flex justify-between mt-6">
-            <div className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              {loading ? 'Loading...' : `${profiles.length} profiles found`}
-            </div>
-            <button 
-              onClick={clearFilters}
-              className={`flex items-center px-4 py-2 border rounded ${
-                darkMode 
-                  ? 'border-gray-600 bg-gray-700 text-white hover:bg-gray-600' 
-                  : 'border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              <X className="mr-2" size={16} /> Clear Filters
-            </button>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="mt-4 p-4 bg-red-100 text-red-600 rounded">
-              {error}
-            </div>
-          )}
-        </div>
-
-        {/* Profiles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {loading ? (
-            <div className={`col-span-3 text-center py-8 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Loading profiles...
-            </div>
-          ) : profiles.length > 0 ? (
-            profiles.map(profile => (
-              <div key={profile._id} className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md overflow-hidden`}>
-                <img 
-                  src={profile.profilePicture || '/api/placeholder/400/320'} 
-                  alt={`${profile.firstName} ${profile.lastName}`} 
-                  className="w-full h-64 object-cover"
-                />
-                <div className="p-4">
-                  <div className={`text-xl font-semibold ${darkMode ? 'text-red-400' : 'text-red-500'} mb-4`}>
-                    {`${profile.firstName} ${profile.lastName || ''}`}
-                  </div>
-                  <div className={`space-y-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    <div className="flex items-center">
-                      <Cake className="mr-2" size={16} /> {profile.age} years
-                    </div>
-                    <div className="flex items-center">
-                      <Languages className="mr-2" size={16} /> {profile.motherTongue}
-                    </div>
-                    <div className="flex items-center">
-                      <MapPin className="mr-2" size={16} /> {profile.currentAddress?.city || 'Unknown'}
-                    </div>
-                    <div className="flex items-center">
-                      <Users className="mr-2" size={16} /> {profile.gotra}
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => navigate(`/profile/${profile._id}`)}
-                    className={`w-full mt-4 px-4 py-2 rounded ${
-                      darkMode 
-                        ? 'bg-red-600 hover:bg-red-700' 
-                        : 'bg-red-500 hover:bg-red-600'
-                    } text-white transition-colors duration-200`}
-                  >
-                    View Profile
-                  </button>
-                </div>
+      {/* Hero Section */}
+      <section className={`relative overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-red-50 via-pink-50 to-orange-50'}`}>
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-pink-500/5"></div>
+        <div className="container mx-auto px-4 py-16 relative z-10">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="flex justify-center mb-6">
+              <div className={`p-4 rounded-full ${darkMode ? 'bg-red-500/20' : 'bg-red-500/10'} shadow-lg`}>
+                <Sparkles className={`w-12 h-12 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
               </div>
-            ))
-          ) : (
-            <div className={`col-span-3 text-center py-8 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              No profiles found matching your filters
             </div>
-          )}
+            <h1 className={`text-5xl md:text-6xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'} leading-tight`}>
+              Explore Profiles
+            </h1>
+            <p className={`text-xl md:text-2xl ${darkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
+              Discover your perfect match from our verified community
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* Main Content */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          {/* Filter Section */}
+          <div className={`p-8 rounded-3xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-2xl border ${darkMode ? 'border-gray-700' : 'border-gray-100'} mb-12`}>
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center">
+                <div className={`p-3 rounded-full ${darkMode ? 'bg-red-500/20' : 'bg-red-100'} mr-4`}>
+                  <Filter className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
+                </div>
+                <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Filter Profiles
+                </h2>
+              </div>
+              <button
+                onClick={clearFilters}
+                className={`flex items-center px-6 py-3 rounded-2xl font-semibold transition-all duration-300 ${
+                  darkMode
+                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <X className="w-5 h-5 mr-2" />
+                Clear Filters
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div>
+                <label className={`flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-3 font-medium`}>
+                  <Search className="mr-2" size={18} />
+                  Looking for
+                </label>
+                <select
+                  className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white focus:border-red-500' 
+                      : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-red-500'
+                  } focus:outline-none`}
+                  value={filters.lookingFor}
+                  onChange={(e) => handleFilterChange('lookingFor', e.target.value)}
+                >
+                  {filterOptions.lookingFor.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className={`flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-3 font-medium`}>
+                  <Languages className="mr-2" size={18} />
+                  Mother Tongue
+                </label>
+                <select
+                  className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white focus:border-red-500' 
+                      : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-red-500'
+                  } focus:outline-none`}
+                  value={filters.language}
+                  onChange={(e) => handleFilterChange('language', e.target.value)}
+                >
+                  {filterOptions.languages.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className={`flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-3 font-medium`}>
+                  <MapPin className="mr-2" size={18} />
+                  City
+                </label>
+                <select
+                  className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white focus:border-red-500' 
+                      : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-red-500'
+                  } focus:outline-none`}
+                  value={filters.city}
+                  onChange={(e) => handleFilterChange('city', e.target.value)}
+                >
+                  {filterOptions.cities.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className={`flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-3 font-medium`}>
+                  <Users className="mr-2" size={18} />
+                  Gotra
+                </label>
+                <select
+                  className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white focus:border-red-500' 
+                      : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-red-500'
+                  } focus:outline-none`}
+                  value={filters.gotra}
+                  onChange={(e) => handleFilterChange('gotra', e.target.value)}
+                >
+                  {filterOptions.gotras.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+              <div className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} font-medium`}>
+                {loading ? 'Loading...' : `${profiles.length} profiles found`}
+              </div>
+              {plan === 'premium' && (
+                <div className={`flex items-center ${darkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
+                  <Star className="w-5 h-5 mr-2" />
+                  <span className="font-medium">Premium Access</span>
+                </div>
+              )}
+            </div>
+
+            {/* Error Messages */}
+            {(error || interestError) && (
+              <div className={`mt-6 p-4 rounded-2xl ${darkMode ? 'bg-red-500/20' : 'bg-red-100'} ${darkMode ? 'text-red-400' : 'text-red-600'} border ${darkMode ? 'border-red-500/30' : 'border-red-200'}`}>
+                {error || interestError}
+              </div>
+            )}
+
+        
+          </div>
+
+          {/* Profiles Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {loading ? (
+              <div className={`col-span-full text-center py-16 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                <div className="flex justify-center mb-4">
+                  <div className={`w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin`}></div>
+                </div>
+                <p className="text-lg font-medium">Loading profiles...</p>
+              </div>
+            ) : profiles.length > 0 ? (
+              profiles.map((profile) => (
+                <div
+                  key={profile._id}
+                  className={`group ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden border ${darkMode ? 'border-gray-700' : 'border-gray-100'} hover:scale-105`}
+                >
+                  <div className="relative">
+                    <img
+                      src={profile.profilePicture || '/api/placeholder/400/320'}
+                      alt={`${profile.firstName} ${profile.lastName || ''}`}
+                      className="w-full h-64 object-cover"
+                    />
+                    <div className="absolute top-4 right-4">
+                      <button
+                        disabled={likeLoading || unlikeLoading}
+                        onClick={() => {
+                          if (plan !== 'premium') {
+                            if (isDev) console.log('ExploreProfiles: Non-premium user attempted like/unlike', { profileId: profile._id });
+                            navigate('/subscription');
+                            return;
+                          }
+                          handleLikeToggle(profile._id);
+                        }}
+                        className={`p-3 rounded-full transition-all duration-300 ${
+                          isProfileLiked(profile._id)
+                            ? 'bg-red-500 text-white shadow-lg'
+                            : darkMode
+                            ? 'bg-gray-800/80 text-gray-400 hover:text-white'
+                            : 'bg-white/80 text-gray-500 hover:text-red-500'
+                        }`}
+                        title={isProfileLiked(profile._id) ? 'Unlike' : 'Like'}
+                      >
+                        <Heart
+                          className={`w-5 h-5 ${
+                            isProfileLiked(profile._id) ? 'fill-current' : ''
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <div className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {`${profile.firstName} ${profile.lastName || ''}`}
+                    </div>
+                    
+                    <div className={`space-y-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      <div className="flex items-center">
+                        <div className={`p-2 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} mr-3`}>
+                          <Cake className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium">{profile.age} years</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <div className={`p-2 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} mr-3`}>
+                          <Languages className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium">{profile.motherTongue}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <div className={`p-2 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} mr-3`}>
+                          <MapPin className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium">{profile.currentAddress?.city || 'Unknown'}</span>
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <div className={`p-2 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} mr-3`}>
+                          <Users className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium">{profile.gotra}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6">
+                      <button
+                        onClick={() => {
+                          if (plan !== 'premium') {
+                            if (isDev) console.log('ExploreProfiles: Non-premium user attempted to view profile', { profileId: profile._id });
+                            navigate('/subscription');
+                            return;
+                          }
+                          navigate(`/profile/${profile._id}`);
+                        }}
+                        className={`group flex items-center justify-center w-full py-3 px-6 rounded-2xl font-semibold transition-all duration-300 ${
+                          darkMode 
+                            ? 'bg-red-500 hover:bg-red-600 text-white' 
+                            : 'bg-red-500 hover:bg-red-600 text-white'
+                        } shadow-lg hover:shadow-xl transform hover:scale-105`}
+                      >
+                        <Eye className="w-5 h-5 mr-2" />
+                        <span>View Profile</span>
+                        <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className={`col-span-full text-center py-16 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                <div className="flex justify-center mb-4">
+                  <div className={`p-4 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                    <Search className={`w-8 h-8 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">No profiles found</h3>
+                <p>Try adjusting your filters to find more matches</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
