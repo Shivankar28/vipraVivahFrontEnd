@@ -1,8 +1,8 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import APIConnector from '../../api/APIConnector';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import APIConnector from "../../api/APIConnector";
 
 export const getSubscriptionStatus = createAsyncThunk(
-  'subscription/getSubscriptionStatus',
+  "subscription/getSubscriptionStatus",
   async (token, { rejectWithValue }) => {
     try {
       return await APIConnector.getSubscriptionStatus(token);
@@ -12,11 +12,22 @@ export const getSubscriptionStatus = createAsyncThunk(
   }
 );
 
-export const upgradeToPremium = createAsyncThunk(
-  'subscription/upgradeToPremium',
+export const createOrder = createAsyncThunk(
+  "subscription/createOrder",
   async (token, { rejectWithValue }) => {
     try {
-      return await APIConnector.upgradeToPremium(token);
+      return await APIConnector.createOrder(token);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const upgradeToPremium = createAsyncThunk(
+  "subscription/upgradeToPremium",
+  async ({ token, paymentData }, { rejectWithValue }) => {
+    try {
+      return await APIConnector.upgradeToPremium(token, paymentData);
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -24,14 +35,15 @@ export const upgradeToPremium = createAsyncThunk(
 );
 
 const subscriptionSlice = createSlice({
-  name: 'subscription',
+  name: "subscription",
   initialState: {
     status: null,
     loading: false,
     error: null,
     upgradeLoading: false,
     upgradeSuccess: false,
-    plan: 'free',
+    plan: "free",
+    order: null,
   },
   reducers: {
     resetUpgradeSuccess(state) {
@@ -51,12 +63,24 @@ const subscriptionSlice = createSlice({
         state.loading = false;
         state.status = action.payload;
         state.error = null;
-        // Set plan based on backend response
-        if (action.payload && action.payload.data && action.payload.data.subscription) {
+        if (action.payload?.data?.subscription) {
           state.plan = action.payload.data.subscription.plan;
         }
       })
       .addCase(getSubscriptionStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+      .addCase(createOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.order = action.payload;
+        state.error = null;
+      })
+      .addCase(createOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
       })
@@ -70,8 +94,7 @@ const subscriptionSlice = createSlice({
         state.upgradeSuccess = true;
         state.status = action.payload;
         state.error = null;
-        // Set plan based on backend response
-        if (action.payload && action.payload.data && action.payload.data.subscription) {
+        if (action.payload?.data?.subscription) {
           state.plan = action.payload.data.subscription.plan;
         }
       })
@@ -84,4 +107,4 @@ const subscriptionSlice = createSlice({
 });
 
 export const { resetUpgradeSuccess, setPlan } = subscriptionSlice.actions;
-export default subscriptionSlice.reducer; 
+export default subscriptionSlice.reducer;

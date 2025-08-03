@@ -484,14 +484,19 @@ export default function MatrimonyRegistration() {
         // Save preferences if they exist
         if (formData.preferences) {
           try {
-            const preferencesResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.vipravivah.in'}/api/preferences`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify(formData.preferences)
-            });
+            const preferencesResponse = await fetch(
+              `${
+                import.meta.env.VITE_API_URL || "https://api.vipravivah.in"
+              }/api/preferences`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(formData.preferences),
+              }
+            );
             
             if (preferencesResponse.ok) {
               if (isDev) console.log('Preferences saved successfully');
