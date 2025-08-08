@@ -85,12 +85,14 @@ export default function Login() {
         localStorage.setItem('token', token);
         if (isDev) console.log('Login Token:', token);
 
-        // Decode token to get isProfileFlag
+        // Decode token to get isProfileFlag and role
         let isProfileFlag = false;
+        let userRole = 'user';
         try {
           const decoded = jwtDecode(token);
           if (isDev) console.log('Decoded Token:', decoded);
           isProfileFlag = decoded.isProfileFlag || false;
+          userRole = decoded.role || 'user';
         } catch (err) {
           if (isDev) console.error('Token Decode Error:', err);
           setError('Invalid token. Please try again.');
@@ -98,17 +100,20 @@ export default function Login() {
           return;
         }
 
-        // Navigate based on isProfileFlag
+        // Navigate based on role and isProfileFlag
         if (isDev) {
           console.log('isProfileFlag:', isProfileFlag);
-          console.log('Navigating to:', isProfileFlag ? '/explore' : '/matrimony-registration');
+          console.log('userRole:', userRole);
           console.groupEnd();
         }
         
         // Show welcome notification
         notifyWelcome();
         
-        if (isProfileFlag) {
+        // Check if user is admin
+        if (userRole === 'admin') {
+          navigate('/admin');
+        } else if (isProfileFlag) {
           navigate('/explore');
         } else {
           navigate('/matrimony-registration');

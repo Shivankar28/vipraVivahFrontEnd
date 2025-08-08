@@ -5,6 +5,7 @@ import {
   upgradeToPremium,
   getSubscriptionStatus,
 } from "../../redux/slices/subscriptionSlice";
+import { getProfile } from "../../redux/slices/profileSlice";
 import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 import {
@@ -44,6 +45,8 @@ const SubscriptionPage = () => {
   const navigate = useNavigate();
   const { status, loading, error, upgradeLoading, upgradeSuccess, order } =
     useSelector((state) => state.subscription);
+  const { user } = useSelector((state) => state.auth);
+  const { profile } = useSelector((state) => state.profile);
   const { darkMode } = useTheme();
   const isLoggedIn =
     localStorage.getItem("isLoggedIn") === "true" &&
@@ -53,6 +56,8 @@ const SubscriptionPage = () => {
   useEffect(() => {
     if (token) {
       dispatch(getSubscriptionStatus(token));
+      // Load user profile data for payment prefill
+      dispatch(getProfile(token));
     }
   }, [dispatch, token]);
 
@@ -61,8 +66,27 @@ const SubscriptionPage = () => {
     navigate("/login");
   };
 
- const handleUpgrade = async () => {
-   if (!token) return;
+  // Get user data for Razorpay prefill
+  const getUserDataForPayment = () => {
+    const userEmail = user?.email || '';
+    const userName = profile 
+      ? `${profile.firstName || ''} ${profile.middleName || ''} ${profile.lastName || ''}`.trim() || 'Customer'
+      : 'Customer';
+    const userPhone = profile?.phoneNumber || '';
+
+    return {
+      name: userName,
+      email: userEmail,
+      contact: userPhone,
+    };
+  };
+
+  const handleUpgrade = async () => {
+   // Check if user is logged in
+   if (!token || !isLoggedIn) {
+     navigate("/login");
+     return;
+   }
 
    try {
      // Step 1: Create Razorpay order
@@ -92,11 +116,7 @@ const SubscriptionPage = () => {
            console.error("Upgrade failed", error);
          }
        },
-       prefill: {
-         name: "Customer Name",
-         email: "customer@example.com",
-         contact: "+919876543210",
-       },
+       prefill: getUserDataForPayment(),
        theme: {
          color: darkMode ? "#ffffff" : "#000000",
        },

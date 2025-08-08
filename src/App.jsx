@@ -15,6 +15,11 @@ import SubscriptionPage from './components/Pages/SubscriptionPage';
 import TermsOfService from './components/Pages/TermsOfService';
 import PrivacyPolicy from './components/Pages/PrivacyPolicy';
 import RequirePremium from './components/RequirePremium';
+import AdminLayout from './components/AdminLayout';
+import AdminDashboard from './components/Pages/AdminDashboard';
+import AdminUsers from './components/Pages/AdminUsers';
+import AdminProfiles from './components/Pages/AdminProfiles';
+import AdminSubscriptions from './components/Pages/AdminSubscriptions';
 import { Provider } from 'react-redux';
 import { store } from '../src/redux/store';
 import { setPlan } from './redux/slices/subscriptionSlice';
@@ -52,6 +57,28 @@ function App() {
           <Route path="/subscription" element={<SubscriptionPage />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={
+            <AdminLayout>
+              <AdminDashboard />
+            </AdminLayout>
+          } />
+          <Route path="/admin/users" element={
+            <AdminLayout>
+              <AdminUsers />
+            </AdminLayout>
+          } />
+          <Route path="/admin/profiles" element={
+            <AdminLayout>
+              <AdminProfiles />
+            </AdminLayout>
+          } />
+          <Route path="/admin/subscriptions" element={
+            <AdminLayout>
+              <AdminSubscriptions />
+            </AdminLayout>
+          } />
         </Routes>
       </WebSocketProvider>
     </Provider>

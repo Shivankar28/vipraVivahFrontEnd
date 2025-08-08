@@ -5,6 +5,7 @@ import profileReducer from './slices/profileSlice';
 import interestReducer from './slices/interestSlice';
 import subscriptionReducer from './slices/subscriptionSlice';
 import notificationReducer from './slices/notificationSlice';
+import adminReducer from './slices/adminSlice';
 
 // Utility to check if in development mode
 const isDev = process.env.NODE_ENV === 'development';
@@ -17,6 +18,7 @@ if (isDev) {
     interest: 'interestReducer',
     subscription: 'subscriptionReducer',
     notification: 'notificationReducer',
+    admin: 'adminReducer',
   });
 }
 
@@ -27,6 +29,7 @@ export const store = configureStore({
     interest: interestReducer,
     subscription: subscriptionReducer,
     notification: notificationReducer,
+    admin: adminReducer,
   },
 });
 

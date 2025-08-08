@@ -231,6 +231,75 @@ const APIConnector = {
         Authorization: `Bearer ${token}`,
       },
     }),
+
+  // Admin Endpoints
+  getDashboardStats: (token) =>
+    APIConnector.request({
+      method: "GET",
+      url: `${BASE_URL}/api/admin/dashboard`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  getAllUsers: (token, params = {}) =>
+    APIConnector.request({
+      method: "GET",
+      url: `${BASE_URL}/api/admin/users`,
+      params,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  getUserById: (token, userId) =>
+    APIConnector.request({
+      method: "GET",
+      url: `${BASE_URL}/api/admin/users/${userId}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  updateUserRole: (token, userId, role) =>
+    APIConnector.request({
+      method: "PUT",
+      url: `${BASE_URL}/api/admin/users/${userId}/role`,
+      data: { role },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }),
+
+  deleteUser: (token, userId) =>
+    APIConnector.request({
+      method: "DELETE",
+      url: `${BASE_URL}/api/admin/users/${userId}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  getAllProfiles: (token, params = {}) =>
+    APIConnector.request({
+      method: "GET",
+      url: `${BASE_URL}/api/admin/profiles`,
+      params,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+
+  getAllSubscriptions: (token, params = {}) =>
+    APIConnector.request({
+      method: "GET",
+      url: `${BASE_URL}/api/admin/subscriptions`,
+      params,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
 };
 
 export default APIConnector;
