@@ -153,43 +153,43 @@ const SubscriptionPage = () => {
         }`}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-pink-500/5"></div>
-        <div className="container mx-auto px-4 py-24 relative z-10">
+        <div className="container mx-auto px-4 py-12 sm:py-16 md:py-20 lg:py-24 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mb-6 sm:mb-8">
               <div
-                className={`p-6 rounded-full ${
+                className={`p-4 sm:p-5 md:p-6 rounded-full ${
                   darkMode ? "bg-red-500/20" : "bg-red-500/10"
                 } shadow-lg`}
               >
                 <Crown
-                  className={`w-16 h-16 ${
+                  className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 ${
                     darkMode ? "text-red-400" : "text-red-500"
                   }`}
                 />
               </div>
             </div>
             <h1
-              className={`text-6xl md:text-7xl font-bold mb-8 ${
+              className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 sm:mb-8 ${
                 darkMode ? "text-white" : "text-gray-900"
-              } leading-tight`}
+              } leading-tight px-2`}
             >
               Choose Your Plan
             </h1>
             <p
-              className={`text-xl md:text-2xl ${
+              className={`text-base sm:text-lg md:text-xl lg:text-2xl ${
                 darkMode ? "text-gray-300" : "text-gray-600"
-              } max-w-3xl mx-auto leading-relaxed mb-12`}
+              } max-w-3xl mx-auto leading-relaxed mb-8 sm:mb-12 px-4`}
             >
               Unlock premium features to enhance your matrimony journey and find
               your perfect match faster.
             </p>
-            <div className="flex justify-center">
+            <div className="flex justify-center px-4">
               <div
-                className={`inline-flex items-center px-6 py-3 rounded-full ${
+                className={`inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 rounded-full ${
                   darkMode ? "bg-red-500/20" : "bg-red-500/10"
-                } ${darkMode ? "text-red-400" : "text-red-600"} font-medium`}
+                } ${darkMode ? "text-red-400" : "text-red-600"} font-medium text-sm sm:text-base`}
               >
-                <Star className="w-5 h-5 mr-2" />
+                <Star className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 <span>Premium Features Available</span>
               </div>
             </div>
@@ -197,52 +197,52 @@ const SubscriptionPage = () => {
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+      <section className="py-10 sm:py-16 md:py-20">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12 max-w-6xl mx-auto">
             <div
-              className={`group p-10 rounded-3xl ${
+              className={`group p-6 sm:p-8 md:p-10 rounded-xl sm:rounded-2xl md:rounded-3xl ${
                 darkMode ? "bg-gray-800" : "bg-white"
               } shadow-xl hover:shadow-2xl transition-all duration-500 border-2 ${
                 darkMode ? "border-gray-700" : "border-gray-200"
-              } hover:scale-105`}
+              } sm:hover:scale-105`}
             >
-              <div className="text-center mb-8">
+              <div className="text-center mb-6 sm:mb-8">
                 <div
-                  className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${
+                  className={`inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl ${
                     darkMode ? "bg-gray-700" : "bg-gray-100"
-                  } mb-6`}
+                  } mb-4 sm:mb-6`}
                 >
                   <Users
-                    className={`w-8 h-8 ${
+                    className={`w-7 h-7 sm:w-8 sm:h-8 ${
                       darkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                   />
                 </div>
                 <h3
-                  className={`text-3xl font-bold mb-4 ${
+                  className={`text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 ${
                     darkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
                   Free Plan
                 </h3>
                 <p
-                  className={`text-lg ${
+                  className={`text-sm sm:text-base md:text-lg ${
                     darkMode ? "text-gray-300" : "text-gray-600"
-                  } mb-6`}
+                  } mb-4 sm:mb-6 px-2`}
                 >
                   Perfect for getting started with your matrimony journey
                 </p>
-                <div className="mb-8">
+                <div className="mb-6 sm:mb-8">
                   <span
-                    className={`text-4xl font-bold ${
+                    className={`text-3xl sm:text-4xl font-bold ${
                       darkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
                     ₹0
                   </span>
                   <span
-                    className={`text-lg ${
+                    className={`text-base sm:text-lg ${
                       darkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
@@ -251,22 +251,22 @@ const SubscriptionPage = () => {
                   </span>
                 </div>
               </div>
-              <div className="space-y-4 mb-8">
+              <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                 {features.free.map((feature, index) => (
-                  <div key={index} className="flex items-center">
+                  <div key={index} className="flex items-start sm:items-center">
                     <div
                       className={`p-1 rounded-full ${
                         darkMode ? "bg-green-500/20" : "bg-green-100"
-                      } mr-4`}
+                      } mr-3 sm:mr-4 mt-0.5 sm:mt-0 flex-shrink-0`}
                     >
                       <Check
-                        className={`w-4 h-4 ${
+                        className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
                           darkMode ? "text-green-400" : "text-green-500"
                         }`}
                       />
                     </div>
                     <span
-                      className={`${
+                      className={`text-sm sm:text-base ${
                         darkMode ? "text-gray-300" : "text-gray-600"
                       }`}
                     >
@@ -276,7 +276,7 @@ const SubscriptionPage = () => {
                 ))}
               </div>
               <button
-                className={`w-full py-4 px-6 rounded-2xl font-semibold text-lg transition-all duration-300 ${
+                className={`w-full py-3 sm:py-4 px-6 rounded-lg sm:rounded-2xl font-semibold text-base sm:text-lg transition-all duration-300 ${
                   status?.data?.subscription?.plan === "free"
                     ? darkMode
                       ? "bg-gray-700 text-gray-400 cursor-not-allowed"
@@ -292,60 +292,60 @@ const SubscriptionPage = () => {
             </div>
 
             <div
-              className={`group p-10 rounded-3xl ${
+              className={`group p-6 sm:p-8 md:p-10 rounded-xl sm:rounded-2xl md:rounded-3xl ${
                 darkMode ? "bg-gray-800" : "bg-white"
               } shadow-xl hover:shadow-2xl transition-all duration-500 border-2 ${
                 darkMode ? "border-red-500/50" : "border-red-500"
-              } hover:scale-105 relative overflow-hidden`}
+              } sm:hover:scale-105 relative overflow-hidden`}
             >
-              <div className="absolute top-6 right-6">
+              <div className="absolute top-4 sm:top-6 right-4 sm:right-6">
                 <div
-                  className={`px-4 py-2 rounded-full ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full ${
                     darkMode ? "bg-red-500/20" : "bg-red-100"
                   } ${
                     darkMode ? "text-red-400" : "text-red-600"
-                  } text-sm font-semibold flex items-center`}
+                  } text-xs sm:text-sm font-semibold flex items-center`}
                 >
-                  <Crown className="w-4 h-4 mr-2" />
+                  <Crown className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Premium
                 </div>
               </div>
-              <div className="text-center mb-8">
+              <div className="text-center mb-6 sm:mb-8">
                 <div
-                  className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${
+                  className={`inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl ${
                     darkMode ? "bg-red-500/20" : "bg-red-100"
-                  } mb-6`}
+                  } mb-4 sm:mb-6`}
                 >
                   <Crown
-                    className={`w-8 h-8 ${
+                    className={`w-7 h-7 sm:w-8 sm:h-8 ${
                       darkMode ? "text-red-400" : "text-red-500"
                     }`}
                   />
                 </div>
                 <h3
-                  className={`text-3xl font-bold mb-4 ${
+                  className={`text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 ${
                     darkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
                   Premium Plan
                 </h3>
                 <p
-                  className={`text-lg ${
+                  className={`text-sm sm:text-base md:text-lg ${
                     darkMode ? "text-gray-300" : "text-gray-600"
-                  } mb-6`}
+                  } mb-4 sm:mb-6 px-2`}
                 >
                   Unlock advanced features for the best matchmaking experience
                 </p>
-                <div className="mb-8">
+                <div className="mb-6 sm:mb-8">
                   <span
-                    className={`text-4xl font-bold ${
+                    className={`text-3xl sm:text-4xl font-bold ${
                       darkMode ? "text-red-400" : "text-red-500"
                     }`}
                   >
                     ₹501
                   </span>
                   <span
-                    className={`text-lg ${
+                    className={`text-base sm:text-lg ${
                       darkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
@@ -354,22 +354,22 @@ const SubscriptionPage = () => {
                   </span>
                 </div>
               </div>
-              <div className="space-y-4 mb-8">
+              <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                 {features.premium.map((feature, index) => (
-                  <div key={index} className="flex items-center">
+                  <div key={index} className="flex items-start sm:items-center">
                     <div
                       className={`p-1 rounded-full ${
                         darkMode ? "bg-red-500/20" : "bg-red-100"
-                      } mr-4`}
+                      } mr-3 sm:mr-4 mt-0.5 sm:mt-0 flex-shrink-0`}
                     >
                       <Check
-                        className={`w-4 h-4 ${
+                        className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
                           darkMode ? "text-red-400" : "text-red-500"
                         }`}
                       />
                     </div>
                     <span
-                      className={`${
+                      className={`text-sm sm:text-base ${
                         darkMode ? "text-gray-300" : "text-gray-600"
                       }`}
                     >
@@ -380,7 +380,7 @@ const SubscriptionPage = () => {
               </div>
               <button
                 onClick={handleUpgrade}
-                className={`w-full py-4 px-6 rounded-2xl font-semibold text-lg transition-all duration-300 ${
+                className={`w-full py-3 sm:py-4 px-6 rounded-lg sm:rounded-2xl font-semibold text-base sm:text-lg transition-all duration-300 ${
                   upgradeLoading ||
                   status?.data?.subscription?.plan === "premium"
                     ? darkMode
@@ -389,14 +389,14 @@ const SubscriptionPage = () => {
                     : darkMode
                     ? "bg-red-500 hover:bg-red-600 text-white"
                     : "bg-red-500 hover:bg-red-600 text-white"
-                } shadow-lg hover:shadow-xl transform hover:scale-105`}
+                } shadow-lg hover:shadow-xl transform sm:hover:scale-105`}
                 disabled={
                   upgradeLoading ||
                   status?.data?.subscription?.plan === "premium"
                 }
               >
                 <span className="flex items-center justify-center">
-                  <CreditCard className="w-5 h-5 mr-2" />
+                  <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   {upgradeLoading
                     ? "Processing..."
                     : status?.data?.subscription?.plan === "premium"
@@ -409,58 +409,58 @@ const SubscriptionPage = () => {
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container mx-auto px-4">
+      <section className="py-10 sm:py-16 md:py-20">
+        <div className="container mx-auto px-3 sm:px-4">
           <div
-            className={`p-12 rounded-3xl ${
+            className={`p-6 sm:p-8 md:p-10 lg:p-12 rounded-xl sm:rounded-2xl md:rounded-3xl ${
               darkMode ? "bg-gray-800" : "bg-white"
-            } shadow-2xl border ${
+            } shadow-xl sm:shadow-2xl border ${
               darkMode ? "border-gray-700" : "border-gray-100"
             } max-w-4xl mx-auto`}
           >
-            <div className="text-center mb-12">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <h3
-                className={`text-4xl font-bold mb-6 ${
+                className={`text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 ${
                   darkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 Why Choose Premium?
               </h3>
               <p
-                className={`text-xl ${
+                className={`text-sm sm:text-base md:text-lg lg:text-xl ${
                   darkMode ? "text-gray-300" : "text-gray-600"
-                } leading-relaxed`}
+                } leading-relaxed px-2`}
               >
                 Get access to advanced features that will help you find your
                 perfect match faster and more efficiently.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
               <div
-                className={`p-6 rounded-2xl ${
+                className={`p-5 sm:p-6 rounded-xl sm:rounded-2xl ${
                   darkMode ? "bg-gray-700" : "bg-gray-50"
-                } text-center transition-all duration-300 hover:scale-105`}
+                } text-center transition-all duration-300 sm:hover:scale-105`}
               >
                 <div
-                  className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${
+                  className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl ${
                     darkMode ? "bg-red-500/20" : "bg-red-100"
-                  } mb-4`}
+                  } mb-3 sm:mb-4`}
                 >
                   <Zap
-                    className={`w-6 h-6 ${
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ${
                       darkMode ? "text-red-400" : "text-red-500"
                     }`}
                   />
                 </div>
                 <h4
-                  className={`text-xl font-semibold mb-3 ${
+                  className={`text-lg sm:text-xl font-semibold mb-2 sm:mb-3 ${
                     darkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
                   Priority Access
                 </h4>
                 <p
-                  className={`text-sm ${
+                  className={`text-xs sm:text-sm ${
                     darkMode ? "text-gray-300" : "text-gray-600"
                   }`}
                 >
@@ -468,30 +468,30 @@ const SubscriptionPage = () => {
                 </p>
               </div>
               <div
-                className={`p-6 rounded-2xl ${
+                className={`p-5 sm:p-6 rounded-xl sm:rounded-2xl ${
                   darkMode ? "bg-gray-700" : "bg-gray-50"
-                } text-center transition-all duration-300 hover:scale-105`}
+                } text-center transition-all duration-300 sm:hover:scale-105`}
               >
                 <div
-                  className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${
+                  className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl ${
                     darkMode ? "bg-red-500/20" : "bg-red-100"
-                  } mb-4`}
+                  } mb-3 sm:mb-4`}
                 >
                   <Shield
-                    className={`w-6 h-6 ${
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ${
                       darkMode ? "text-red-400" : "text-red-500"
                     }`}
                   />
                 </div>
                 <h4
-                  className={`text-xl font-semibold mb-3 ${
+                  className={`text-lg sm:text-xl font-semibold mb-2 sm:mb-3 ${
                     darkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
                   Verified Profiles
                 </h4>
                 <p
-                  className={`text-sm ${
+                  className={`text-xs sm:text-sm ${
                     darkMode ? "text-gray-300" : "text-gray-600"
                   }`}
                 >
@@ -499,30 +499,30 @@ const SubscriptionPage = () => {
                 </p>
               </div>
               <div
-                className={`p-6 rounded-2xl ${
+                className={`p-5 sm:p-6 rounded-xl sm:rounded-2xl ${
                   darkMode ? "bg-gray-700" : "bg-gray-50"
-                } text-center transition-all duration-300 hover:scale-105`}
+                } text-center transition-all duration-300 sm:hover:scale-105`}
               >
                 <div
-                  className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${
+                  className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl ${
                     darkMode ? "bg-red-500/20" : "bg-red-100"
-                  } mb-4`}
+                  } mb-3 sm:mb-4`}
                 >
                   <Users
-                    className={`w-6 h-6 ${
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ${
                       darkMode ? "text-red-400" : "text-red-500"
                     }`}
                   />
                 </div>
                 <h4
-                  className={`text-xl font-semibold mb-3 ${
+                  className={`text-lg sm:text-xl font-semibold mb-2 sm:mb-3 ${
                     darkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
                   Advanced Matching
                 </h4>
                 <p
-                  className={`text-sm ${
+                  className={`text-xs sm:text-sm ${
                     darkMode ? "text-gray-300" : "text-gray-600"
                   }`}
                 >
@@ -534,52 +534,52 @@ const SubscriptionPage = () => {
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container mx-auto px-4">
+      <section className="py-10 sm:py-16 md:py-20">
+        <div className="container mx-auto px-3 sm:px-4">
           <div
-            className={`p-12 rounded-3xl ${
+            className={`p-6 sm:p-8 md:p-10 lg:p-12 rounded-xl sm:rounded-2xl md:rounded-3xl ${
               darkMode ? "bg-gray-800" : "bg-white"
-            } shadow-2xl border ${
+            } shadow-xl sm:shadow-2xl border ${
               darkMode ? "border-gray-700" : "border-gray-100"
             } max-w-4xl mx-auto text-center`}
           >
             <h3
-              className={`text-4xl font-bold mb-6 ${
+              className={`text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 ${
                 darkMode ? "text-white" : "text-gray-900"
               }`}
             >
               Ready to Upgrade?
             </h3>
             <p
-              className={`text-xl ${
+              className={`text-sm sm:text-base md:text-lg lg:text-xl ${
                 darkMode ? "text-gray-300" : "text-gray-600"
-              } mb-10 leading-relaxed`}
+              } mb-8 sm:mb-10 leading-relaxed px-2`}
             >
               Join thousands of premium users who have found their perfect match
               with advanced features.
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
               <button
                 onClick={() => navigate("/contact")}
-                className={`group flex items-center justify-center px-10 py-4 rounded-full font-semibold text-lg transition-all duration-300 ${
+                className={`group flex items-center justify-center px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-full font-semibold text-base sm:text-lg transition-all duration-300 ${
                   darkMode
                     ? "bg-red-500 hover:bg-red-600 text-white"
                     : "bg-red-500 hover:bg-red-600 text-white"
-                } shadow-xl hover:shadow-2xl transform hover:scale-105`}
+                } shadow-xl hover:shadow-2xl transform sm:hover:scale-105`}
               >
                 <span>Contact Support</span>
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </button>
               <button
                 onClick={() => navigate("/explore")}
-                className={`group flex items-center justify-center px-10 py-4 rounded-full font-semibold text-lg transition-all duration-300 ${
+                className={`group flex items-center justify-center px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-full font-semibold text-base sm:text-lg transition-all duration-300 ${
                   darkMode
                     ? "bg-transparent border-2 border-red-500 text-red-400 hover:bg-red-500 hover:text-white"
                     : "bg-transparent border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                } shadow-xl hover:shadow-2xl transform hover:scale-105`}
+                } shadow-xl hover:shadow-2xl transform sm:hover:scale-105`}
               >
                 <span>Explore Profiles</span>
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>

@@ -1,33 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
-  FileText, 
-  Eye, 
   Search,
   Filter,
   User
 } from 'lucide-react';
 import { getAllProfiles } from '../../redux/slices/adminSlice';
-import { useTheme } from '../../context/ThemeContext';
 
 const AdminProfiles = () => {
   const dispatch = useDispatch();
-  const { darkMode } = useTheme();
+  const [darkMode] = useState(false); // Static dark mode or integrate with theme
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
 
   const { profiles, loading, error } = useSelector((state) => state.admin);
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     // Load profiles
-    dispatch(getAllProfiles({ page: currentPage, limit: 10 }));
-  }, [dispatch, currentPage]);
+    if (token) {
+      dispatch(getAllProfiles({ token, page: currentPage, limit: 10 }));
+    }
+  }, [dispatch, token, currentPage]);
 
-  const filteredProfiles = profiles.list.filter(profile =>
-    profile.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    profile.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    profile.city?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Helper to get full name
+  const getFullName = (profile) => {
+    const firstName = profile.firstName || '';
+    const middleName = profile.middleName || '';
+    const lastName = profile.lastName || '';
+    return `${firstName} ${middleName} ${lastName}`.trim() || 'No Name';
+  };
+
+  // Filter profiles based on search term
+  const profilesList = profiles?.list || [];
+  const filteredProfiles = profilesList.filter(profile => {
+    const fullName = getFullName(profile).toLowerCase();
+    const email = profile.userId?.email?.toLowerCase() || '';
+    const city = profile.currentAddress?.city?.toLowerCase() || '';
+    const searchLower = searchTerm.toLowerCase();
+    
+    return fullName.includes(searchLower) ||
+           email.includes(searchLower) ||
+           city.includes(searchLower);
+  });
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -59,7 +74,7 @@ const AdminProfiles = () => {
         </p>
         <div className="mt-4">
           <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-            {profiles.pagination.totalProfiles || 0} total profiles
+            {profiles?.pagination?.totalProfiles || 0} total profiles
           </span>
         </div>
       </div>
@@ -88,19 +103,38 @@ const AdminProfiles = () => {
         </div>
 
         {/* Profiles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProfiles.map((profile) => (
+        {filteredProfiles.length === 0 ? (
+          <div className={`text-center py-12 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+            <User className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className={`mt-2 text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+              No profiles found
+            </h3>
+            <p className={`mt-1 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              {searchTerm ? 'Try adjusting your search criteria.' : 'No profiles have been created yet.'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProfiles.map((profile) => (
             <div
               key={profile._id}
               className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm border ${darkMode ? 'border-gray-700' : 'border-gray-200'} p-6`}
             >
               <div className="flex items-center space-x-4 mb-4">
-                <div className="h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center">
-                  <User className="h-6 w-6 text-white" />
-                </div>
+                {profile.profilePicture ? (
+                  <img 
+                    src={profile.profilePicture} 
+                    alt={getFullName(profile)}
+                    className="h-12 w-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center">
+                    <User className="h-6 w-6 text-white" />
+                  </div>
+                )}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {profile.name || 'No Name'}
+                    {getFullName(profile)}
                   </h3>
                   <p className="text-sm text-gray-500">
                     {profile.userId?.email || 'No Email'}
@@ -120,7 +154,9 @@ const AdminProfiles = () => {
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Location:</span>
                   <span className="text-sm font-medium">
-                    {profile.city && profile.state ? `${profile.city}, ${profile.state}` : 'N/A'}
+                    {profile.currentAddress?.city && profile.currentAddress?.state 
+                      ? `${profile.currentAddress.city}, ${profile.currentAddress.state}` 
+                      : profile.currentAddress?.city || 'N/A'}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -142,20 +178,21 @@ const AdminProfiles = () => {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Pagination */}
-        {profiles.pagination && profiles.pagination.totalPages > 1 && (
-          <div className="mt-8 flex items-center justify-between">
+        {profiles?.pagination && profiles.pagination.totalPages > 1 && (
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-sm text-gray-500">
               Showing {((currentPage - 1) * 10) + 1} to {Math.min(currentPage * 10, profiles.pagination.totalProfiles)} of {profiles.pagination.totalProfiles} profiles
             </div>
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => setCurrentPage(currentPage - 1)}
+                onClick={() => setCurrentPage(prev => prev - 1)}
                 disabled={!profiles.pagination.hasPrevPage}
-                className={`px-3 py-1 rounded-md text-sm ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   profiles.pagination.hasPrevPage
                     ? darkMode
                       ? 'bg-gray-700 hover:bg-gray-600 text-white'
@@ -165,13 +202,13 @@ const AdminProfiles = () => {
               >
                 Previous
               </button>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-500 px-4">
                 Page {currentPage} of {profiles.pagination.totalPages}
               </span>
               <button
-                onClick={() => setCurrentPage(currentPage + 1)}
+                onClick={() => setCurrentPage(prev => prev + 1)}
                 disabled={!profiles.pagination.hasNextPage}
-                className={`px-3 py-1 rounded-md text-sm ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   profiles.pagination.hasNextPage
                     ? darkMode
                       ? 'bg-gray-700 hover:bg-gray-600 text-white'

@@ -151,27 +151,27 @@ const UserProfile = () => {
 
       {/* Success Message */}
       {showSuccess && (
-        <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-50 
+        <div className={`fixed top-16 sm:top-20 left-1/2 transform -translate-x-1/2 z-50 w-11/12 sm:w-auto max-w-md
           ${darkMode ? 'bg-green-800' : 'bg-green-100'} 
           ${darkMode ? 'text-green-100' : 'text-green-800'} 
-          px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2`}
+          px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-lg flex items-center space-x-2 text-sm sm:text-base`}
         >
-          <CheckCircle2 className="w-5 h-5" />
-          <span>{location.state?.updateSuccess ? 'Profile successfully updated!' : 'Profile successfully registered!'}</span>
+          <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+          <span className="leading-tight">{location.state?.updateSuccess ? 'Profile successfully updated!' : 'Profile successfully registered!'}</span>
         </div>
       )}
 
       {/* Main Content */}
-      <div className="container mx-auto py-8 px-4 pt-20">
+      <div className="container mx-auto py-6 sm:py-8 px-3 sm:px-4 pt-16 sm:pt-20">
         {/* Subscription Status & Upgrade */}
-        <div className={`max-w-4xl mx-auto mb-8 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md overflow-hidden`}>
-        <div className="p-6 flex flex-col md:flex-row items-center justify-between">
-          <div>
-            <span className="font-semibold text-lg">Subscription Status: </span>
+        <div className={`max-w-4xl mx-auto mb-6 sm:mb-8 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md overflow-hidden`}>
+        <div className="p-4 sm:p-6 flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0">
+          <div className="text-center md:text-left">
+            <span className="font-semibold text-base sm:text-lg">Subscription Status: </span>
             {loading ? (
-              <span className="italic">Loading...</span>
+              <span className="italic text-sm sm:text-base">Loading...</span>
             ) : (
-              <span className={plan === 'premium' ? 'text-green-600 font-bold' : 'text-yellow-600 font-bold'}>
+              <span className={`${plan === 'premium' ? 'text-green-600' : 'text-yellow-600'} font-bold text-base sm:text-lg`}>
                 {plan === 'premium' ? 'Premium' : 'Free'}
               </span>
             )}
@@ -183,7 +183,7 @@ const UserProfile = () => {
                 if (token) dispatch(upgradeToPremium(token));
               }}
               disabled={upgradeLoading}
-              className={`mt-4 md:mt-0 px-6 py-2 rounded-lg shadow ${
+              className={`w-full md:w-auto px-6 py-2.5 text-sm sm:text-base rounded-lg shadow ${
                 darkMode
                   ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900'
                   : 'bg-yellow-400 hover:bg-yellow-500 text-gray-900'
@@ -203,26 +203,26 @@ const UserProfile = () => {
 
 
         {/* Edit Button - Fixed Position */}
-        <div className="fixed bottom-8 right-8 z-20">
+        <div className="fixed bottom-4 sm:bottom-8 right-4 sm:right-8 z-20">
           <button
             onClick={handleEditProfile}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-lg shadow-lg ${
+            className={`flex items-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-lg ${
               darkMode 
                 ? 'bg-red-500 hover:bg-red-600 text-white' 
                 : 'bg-red-500 hover:bg-red-600 text-white'
-            } transition-all duration-200 hover:shadow-xl`}
+            } transition-all duration-200 hover:shadow-xl text-sm sm:text-base`}
           >
-            <Pencil className="w-5 h-5" />
-            <span className="text-lg font-medium">Edit Profile</span>
+            <Pencil className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="font-medium">Edit Profile</span>
           </button>
         </div>
 
         <div className={`max-w-4xl mx-auto ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md overflow-hidden`}>
           {/* Profile Image Section */}
-          <div className="relative p-6">
+          <div className="relative p-4 sm:p-6">
             <div className="flex justify-center">
               <div className="relative">
-                <div className={`w-48 h-64 rounded-lg overflow-hidden shadow-2xl border-4 ${darkMode ? 'border-gray-600' : 'border-white'} ${darkMode ? 'bg-gray-700' : 'bg-white'}`}>
+                <div className={`w-36 h-48 sm:w-40 sm:h-56 md:w-48 md:h-64 rounded-lg overflow-hidden shadow-xl sm:shadow-2xl border-2 sm:border-4 ${darkMode ? 'border-gray-600' : 'border-white'} ${darkMode ? 'bg-gray-700' : 'bg-white'}`}>
                   {profileData.profilePicture ? (
                     <img 
                       src={profileData.profilePicture} 
@@ -235,7 +235,7 @@ const UserProfile = () => {
                     />
                   ) : null}
                   <div className={`w-full h-full flex items-center justify-center ${darkMode ? 'text-gray-400' : 'text-gray-500'} ${profileData.profilePicture ? 'hidden' : ''}`}>
-                    <User className="w-16 h-16" />
+                    <User className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16" />
                   </div>
                 </div>
                 {/* Passport-style border effect */}
@@ -245,200 +245,200 @@ const UserProfile = () => {
           </div>
           
           {/* Profile Info */}
-          <div className="p-6">
-            <h3 className={`text-2xl font-semibold ${
+          <div className="p-4 sm:p-6">
+            <h3 className={`text-xl sm:text-2xl font-semibold ${
               darkMode ? 'text-red-400' : 'text-red-500'
-            } mb-4`}>
+            } mb-3 sm:mb-4 text-center sm:text-left`}>
               {`${profileData.firstName || 'Unknown'} ${profileData.middleName ? profileData.middleName + ' ' : ''}${profileData.lastName || ''}`}
             </h3>
             
 
             
-            <div className={`space-y-8 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            <div className={`space-y-6 sm:space-y-8 text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               {/* Basic Information */}
-              <div className="border-b border-gray-200 pb-6">
-                <h4 className={`text-lg font-medium mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Basic Information</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className={`border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} pb-5 sm:pb-6`}>
+                <h4 className={`text-base sm:text-lg font-medium mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Basic Information</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div className="flex items-center">
-                    <Calendar className="w-5 h-5 mr-3" />
+                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Date of Birth</span>
-                      <span className="block">{formatDate(profileData.dateOfBirth)}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Date of Birth</span>
+                      <span className="block text-sm sm:text-base">{formatDate(profileData.dateOfBirth)}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <User className="w-5 h-5 mr-3" />
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Age</span>
-                      <span className="block">{calculateAge(profileData.dateOfBirth)}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Age</span>
+                      <span className="block text-sm sm:text-base">{calculateAge(profileData.dateOfBirth)}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <CreditCard className="w-5 h-5 mr-3" />
+                    <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Profile For</span>
-                      <span className="block capitalize">{profileData.profileFor?.replace('_', ' ') || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Profile For</span>
+                      <span className="block text-sm sm:text-base capitalize">{profileData.profileFor?.replace('_', ' ') || 'Not specified'}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Family Information */}
-              <div className="border-b border-gray-200 pb-6">
-                <h4 className={`text-lg font-medium mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Family Information</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className={`border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} pb-5 sm:pb-6`}>
+                <h4 className={`text-base sm:text-lg font-medium mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Family Information</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div className="flex items-center">
-                    <User className="w-5 h-5 mr-3" />
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Father's Name</span>
-                      <span className="block">{profileData.fatherName || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Father's Name</span>
+                      <span className="block text-sm sm:text-base">{profileData.fatherName || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <User className="w-5 h-5 mr-3" />
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Mother's Name</span>
-                      <span className="block">{profileData.motherName || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Mother's Name</span>
+                      <span className="block text-sm sm:text-base">{profileData.motherName || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <Home className="w-5 h-5 mr-3" />
+                    <Home className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Lives with Family</span>
-                      <span className="block">{profileData.isLivesWithFamily || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Lives with Family</span>
+                      <span className="block text-sm sm:text-base">{profileData.isLivesWithFamily || 'Not specified'}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Personal Details */}
-              <div className="border-b border-gray-200 pb-6">
-                <h4 className={`text-lg font-medium mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Personal Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className={`border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} pb-5 sm:pb-6`}>
+                <h4 className={`text-base sm:text-lg font-medium mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Personal Details</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div className="flex items-center">
-                    <Globe className="w-5 h-5 mr-3" />
+                    <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Mother Tongue</span>
-                      <span className="block capitalize">{profileData.motherTongue || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Mother Tongue</span>
+                      <span className="block text-sm sm:text-base capitalize">{profileData.motherTongue || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <User className="w-5 h-5 mr-3" />
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Subcaste</span>
-                      <span className="block capitalize">{profileData.subCaste || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Subcaste</span>
+                      <span className="block text-sm sm:text-base capitalize">{profileData.subCaste || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <User className="w-5 h-5 mr-3" />
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Gotra</span>
-                      <span className="block">{profileData.gotra || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Gotra</span>
+                      <span className="block text-sm sm:text-base">{profileData.gotra || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <User className="w-5 h-5 mr-3" />
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Marital Status</span>
-                      <span className="block capitalize">{profileData.maritalStatus?.replace('_', ' ') || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Marital Status</span>
+                      <span className="block text-sm sm:text-base capitalize">{profileData.maritalStatus?.replace('_', ' ') || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <User className="w-5 h-5 mr-3" />
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Food Habits</span>
-                      <span className="block capitalize">{profileData.foodHabit?.replace('_', ' ') || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Food Habits</span>
+                      <span className="block text-sm sm:text-base capitalize">{profileData.foodHabit?.replace('_', ' ') || 'Not specified'}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Education Details */}
-              <div className="border-b border-gray-200 pb-6">
-                <h4 className={`text-lg font-medium mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Education Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={`border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} pb-5 sm:pb-6`}>
+                <h4 className={`text-base sm:text-lg font-medium mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Education Details</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="flex items-center">
-                    <GraduationCap className="w-5 h-5 mr-3" />
+                    <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Highest Qualification</span>
-                      <span className="block capitalize">{profileData.HighestQualification?.replace('_', ' ') || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Highest Qualification</span>
+                      <span className="block text-sm sm:text-base capitalize">{profileData.HighestQualification?.replace('_', ' ') || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <GraduationCap className="w-5 h-5 mr-3" />
+                    <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Specialization</span>
-                      <span className="block capitalize">{profileData.specialization?.replace('_', ' ') || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Specialization</span>
+                      <span className="block text-sm sm:text-base capitalize">{profileData.specialization?.replace('_', ' ') || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <GraduationCap className="w-5 h-5 mr-3" />
+                    <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">University/College</span>
-                      <span className="block">{profileData.universityCollege || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">University/College</span>
+                      <span className="block text-sm sm:text-base">{profileData.universityCollege || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
                     <Calendar className="w-5 h-5 mr-3" />
                     <div>
-                      <span className="block text-sm opacity-70">Year of Completion</span>
-                      <span className="block">{profileData.yearOfCompletion || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Year of Completion</span>
+                      <span className="block text-sm sm:text-base">{profileData.yearOfCompletion || 'Not specified'}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Career Details */}
-              <div className="border-b border-gray-200 pb-6">
-                <h4 className={`text-lg font-medium mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Career Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={`border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} pb-5 sm:pb-6`}>
+                <h4 className={`text-base sm:text-lg font-medium mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Career Details</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="flex items-center">
-                    <Briefcase className="w-5 h-5 mr-3" />
+                    <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Currently Working</span>
-                      <span className="block">{profileData.currentWorking ? 'Yes' : 'No'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Currently Working</span>
+                      <span className="block text-sm sm:text-base">{profileData.currentWorking ? 'Yes' : 'No'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <Briefcase className="w-5 h-5 mr-3" />
+                    <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Occupation</span>
-                      <span className="block capitalize">{profileData.occupation?.replace('_', ' ') || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Occupation</span>
+                      <span className="block text-sm sm:text-base capitalize">{profileData.occupation?.replace('_', ' ') || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <Briefcase className="w-5 h-5 mr-3" />
+                    <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Company</span>
-                      <span className="block">{profileData.company || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Company</span>
+                      <span className="block text-sm sm:text-base">{profileData.company || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <MapPin className="w-5 h-5 mr-3" />
+                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Work Location</span>
-                      <span className="block">{profileData.workLocation || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Work Location</span>
+                      <span className="block text-sm sm:text-base">{profileData.workLocation || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <Briefcase className="w-5 h-5 mr-3" />
+                    <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">Annual Income</span>
-                      <span className="block">{profileData.annualIncome ? `${profileData.annualIncome} LPA` : 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">Annual Income</span>
+                      <span className="block text-sm sm:text-base">{profileData.annualIncome ? `${profileData.annualIncome} LPA` : 'Not specified'}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Social Media Profiles */}
-              <div className="border-b border-gray-200 pb-6">
-                <h4 className={`text-lg font-medium mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Social Media Profiles</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className={`border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} pb-5 sm:pb-6`}>
+                <h4 className={`text-base sm:text-lg font-medium mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Social Media Profiles</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   {profileData.instaUrl && (
                     <div className="flex items-center">
-                      <Globe className="w-5 h-5 mr-3" />
+                      <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                       <div>
-                        <span className="block text-sm opacity-70">Instagram</span>
+                        <span className="block text-xs sm:text-sm opacity-70">Instagram</span>
                         <a href={profileData.instaUrl} target="_blank" rel="noopener noreferrer" 
                            className="block text-red-500 hover:text-red-600">
                           {profileData.instaUrl}
@@ -448,9 +448,9 @@ const UserProfile = () => {
                   )}
                   {profileData.facebookUrl && (
                     <div className="flex items-center">
-                      <Globe className="w-5 h-5 mr-3" />
+                      <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                       <div>
-                        <span className="block text-sm opacity-70">Facebook</span>
+                        <span className="block text-xs sm:text-sm opacity-70">Facebook</span>
                         <a href={profileData.facebookUrl} target="_blank" rel="noopener noreferrer"
                            className="block text-red-500 hover:text-red-600">
                           {profileData.facebookUrl}
@@ -460,9 +460,9 @@ const UserProfile = () => {
                   )}
                   {profileData.linkedinUrl && (
                     <div className="flex items-center">
-                      <Globe className="w-5 h-5 mr-3" />
+                      <Globe className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                       <div>
-                        <span className="block text-sm opacity-70">LinkedIn</span>
+                        <span className="block text-xs sm:text-sm opacity-70">LinkedIn</span>
                         <a href={profileData.linkedinUrl} target="_blank" rel="noopener noreferrer"
                            className="block text-red-500 hover:text-red-600">
                           {profileData.linkedinUrl}
@@ -475,20 +475,20 @@ const UserProfile = () => {
 
               {/* ID Verification */}
               <div>
-                <h4 className={`text-lg font-medium mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>ID Verification</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h4 className={`text-base sm:text-lg font-medium mb-3 sm:mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>ID Verification</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="flex items-center">
-                    <CreditCard className="w-5 h-5 mr-3" />
+                      <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">ID Type</span>
-                      <span className="block capitalize">{profileData.idCardName?.replace('_', ' ') || 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">ID Type</span>
+                      <span className="block text-sm sm:text-base capitalize">{profileData.idCardName?.replace('_', ' ') || 'Not specified'}</span>
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <CreditCard className="w-5 h-5 mr-3" />
+                      <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" />
                     <div>
-                      <span className="block text-sm opacity-70">ID Number</span>
-                      <span className="block">{profileData.idCardNo ? '•'.repeat(8) : 'Not specified'}</span>
+                      <span className="block text-xs sm:text-sm opacity-70">ID Number</span>
+                      <span className="block text-sm sm:text-base">{profileData.idCardNo ? '•'.repeat(8) : 'Not specified'}</span>
                     </div>
                   </div>
                 </div>

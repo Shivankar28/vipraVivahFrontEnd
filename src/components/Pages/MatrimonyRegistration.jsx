@@ -557,18 +557,19 @@ export default function MatrimonyRegistration() {
       {/* Hero Section */}
       <section className={`relative overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-red-50 via-pink-50 to-orange-50'}`}>
         <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-pink-500/5"></div>
-        <div className="container mx-auto px-4 py-16 relative z-10">
+        <div className="container mx-auto px-4 py-6 sm:py-12 md:py-16 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="flex justify-center mb-6">
-              <div className={`p-4 rounded-full ${darkMode ? 'bg-red-500/20' : 'bg-red-500/10'} shadow-lg`}>
-                <UserPlus className={`w-12 h-12 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
+            <div className="flex justify-center mb-3 sm:mb-6">
+              <div className={`p-3 sm:p-4 rounded-full ${darkMode ? 'bg-red-500/20' : 'bg-red-500/10'} shadow-lg`}>
+                <UserPlus className={`w-10 h-10 sm:w-10 sm:h-10 md:w-12 md:h-12 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
               </div>
             </div>
-            <h1 className={`text-5xl md:text-6xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'} leading-tight`}>
+            <h1 className={`text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-6 ${darkMode ? 'text-white' : 'text-gray-900'} leading-tight`}>
               {isProfileFlag ? 'Edit My Profile' : 'Create My Profile'}
             </h1>
-            <p className={`text-xl md:text-2xl ${darkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed`}>
+            <p className={`text-sm sm:text-lg md:text-xl lg:text-2xl ${darkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed px-2`}>
               Fill in your details to {isProfileFlag ? 'update' : 'create'} your matrimony profile. 
+              <br className="hidden sm:block" />
               Fields marked with <span className="text-red-500 font-semibold">*</span> are required.
             </p>
           </div>
@@ -576,42 +577,42 @@ export default function MatrimonyRegistration() {
       </section>
 
       {/* Main Content */}
-      <section className="py-16">
+      <section className="py-4 sm:py-12 md:py-16 px-3 sm:px-4">
                   <div
             className={`max-w-5xl mx-auto ${
               darkMode ? 'bg-gray-800/50' : 'bg-white'
-            } rounded-3xl shadow-2xl backdrop-blur-sm border ${darkMode ? 'border-gray-700' : 'border-gray-100'} overflow-hidden`}
+            } rounded-xl sm:rounded-3xl shadow-2xl backdrop-blur-sm border ${darkMode ? 'border-gray-700' : 'border-gray-100'} overflow-hidden`}
           >
             {(formError || reduxError) && (
-              <div className="p-6">
-                <div className={`p-6 rounded-3xl ${darkMode ? 'bg-red-500/20' : 'bg-red-100'} ${darkMode ? 'text-red-400' : 'text-red-600'} border ${darkMode ? 'border-red-500/30' : 'border-red-200'}`} role="alert">
+              <div className="p-4 sm:p-4 md:p-6">
+                <div className={`p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-3xl ${darkMode ? 'bg-red-500/20' : 'bg-red-100'} ${darkMode ? 'text-red-400' : 'text-red-600'} border ${darkMode ? 'border-red-500/30' : 'border-red-200'} text-sm sm:text-base`} role="alert">
                   {formError || handleApiError(reduxError)}
                 </div>
               </div>
             )}
-                      <form onSubmit={handleSubmit} className="p-10 space-y-12" aria-label="Profile registration form">
+                      <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 lg:p-10 space-y-6 sm:space-y-10 md:space-y-12" aria-label="Profile registration form">
             <section
-              className={`flex flex-col items-center space-y-8 pb-12 border-b ${
+              className={`flex flex-col items-center space-y-4 sm:space-y-6 md:space-y-8 pb-6 sm:pb-10 md:pb-12 border-b ${
                 darkMode ? 'border-gray-700' : 'border-gray-200'
               }`}
               aria-label="Profile photo upload"
             >
-              <div className="text-center mb-6">
-                <div className={`p-4 rounded-full ${darkMode ? 'bg-red-500/20' : 'bg-red-100'} inline-block mb-4`}>
-                  <Camera className={`w-8 h-8 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
+              <div className="text-center mb-2 sm:mb-4 md:mb-6">
+                <div className={`p-3 sm:p-4 rounded-full ${darkMode ? 'bg-red-500/20' : 'bg-red-100'} inline-block mb-2 sm:mb-4`}>
+                  <Camera className={`w-7 h-7 sm:w-7 sm:h-7 md:w-8 md:h-8 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
                 </div>
-                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                <h3 className={`text-lg sm:text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   Profile Photo
                 </h3>
-                <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                <p className={`text-sm sm:text-base md:text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-1`}>
                   Upload a clear, professional photo
                 </p>
               </div>
               
               <div
-                className={`w-48 h-48 rounded-3xl overflow-hidden border-4 ${
+                className={`w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-xl sm:rounded-3xl overflow-hidden border-2 sm:border-4 ${
                   darkMode ? 'border-gray-700' : 'border-gray-200'
-                } shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105`}
+                } shadow-xl sm:shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105`}
               >
                 {profileImagePreview ? (
                   <img
@@ -626,7 +627,7 @@ export default function MatrimonyRegistration() {
                     }`}
                   >
                     <Camera
-                      className={`w-20 h-20 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}
+                      className={`w-16 h-16 sm:w-16 sm:h-16 md:w-20 md:h-20 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}
                       aria-hidden="true"
                     />
                   </div>
@@ -634,7 +635,7 @@ export default function MatrimonyRegistration() {
               </div>
               
               <label
-                className={`inline-flex items-center px-8 py-4 rounded-2xl cursor-pointer ${
+                className={`inline-flex items-center justify-center px-6 sm:px-6 md:px-8 py-3 sm:py-3 md:py-4 rounded-lg sm:rounded-2xl cursor-pointer ${
                   darkMode
                     ? 'bg-red-500 hover:bg-red-600 text-white'
                     : 'bg-red-500 hover:bg-red-600 text-white'
@@ -648,12 +649,12 @@ export default function MatrimonyRegistration() {
                   aria-label="Upload profile photo"
                   required={!profileImagePreview}
                 />
-                <Upload className="w-5 h-5 mr-3" aria-hidden="true" />
-                <span className="text-lg font-semibold">Upload Profile Photo <span className="text-red-200">*</span></span>
+                <Upload className="w-5 h-5 sm:w-5 sm:h-5 mr-2 sm:mr-3" aria-hidden="true" />
+                <span className="text-base sm:text-base md:text-lg font-semibold">Upload Photo <span className="text-red-200">*</span></span>
               </label>
               
-              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                Maximum file size: 5MB. Only JPEG/PNG allowed. <span className="text-red-500 font-semibold">*Required</span>
+              <p className={`text-xs sm:text-sm text-center px-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'} leading-relaxed`}>
+                Max 5MB • JPEG/PNG only • <span className="text-red-500 font-semibold">Required</span>
               </p>
             </section>
             {[
@@ -669,35 +670,35 @@ export default function MatrimonyRegistration() {
             ].map((section, index) => (
               <section
                 key={index}
-                className={`space-y-8 pb-12 ${
+                className={`space-y-4 sm:space-y-6 md:space-y-8 pb-6 sm:pb-10 md:pb-12 ${
                   index < (isProfileFlag ? 6 : 7) ? (darkMode ? 'border-b border-gray-700' : 'border-b border-gray-200') : ''
-                } ${darkMode ? 'hover:bg-gray-800/30' : 'hover:bg-gray-50'} rounded-lg transition-colors duration-200 p-6`}
+                } ${darkMode ? 'sm:hover:bg-gray-800/30' : 'sm:hover:bg-gray-50'} rounded-lg transition-colors duration-200 p-0 sm:p-4 md:p-6`}
                 aria-label={section}
               >
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <div className={`p-3 rounded-full ${darkMode ? 'bg-red-500/20' : 'bg-red-100'}`}>
-                      {section === 'Profile For Section' && <UserPlus className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
-                      {section === 'Basic Information' && <UserPlus className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
-                      {section === 'Family Information' && <Heart className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
-                      {section === 'Personal Details' && <Sparkles className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
-                      {section === 'Education Details' && <GraduationCap className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
-                      {section === 'Career Details' && <Briefcase className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
-                      {section === 'Social Media Profiles' && <Globe className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
-                      {section === 'ID Verification' && <Shield className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
-      {section === 'Preferences' && <Settings className={`w-6 h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                <div className="space-y-2 sm:space-y-3 md:space-y-4">
+                  <div className="flex items-center space-x-2 sm:space-x-4">
+                    <div className={`p-2 sm:p-3 rounded-full ${darkMode ? 'bg-red-500/20' : 'bg-red-100'} flex-shrink-0`}>
+                      {section === 'Profile For Section' && <UserPlus className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'Basic Information' && <UserPlus className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'Family Information' && <Heart className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'Personal Details' && <Sparkles className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'Education Details' && <GraduationCap className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'Career Details' && <Briefcase className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'Social Media Profiles' && <Globe className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+                      {section === 'ID Verification' && <Shield className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
+      {section === 'Preferences' && <Settings className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />}
                     </div>
-                    <div>
-                      <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <div className="flex-1">
+                      <h2 className={`text-lg sm:text-2xl md:text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} leading-tight`}>
                         {section}
                       </h2>
-                      <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      <p className={`text-xs sm:text-base md:text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-0.5 leading-snug`}>
                         {getSubtitle(section)}
                       </p>
                     </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 mt-4">
                   {section === 'Profile For Section' && (
                     <>
                       <div className="col-span-full">
@@ -1773,77 +1774,82 @@ export default function MatrimonyRegistration() {
                   )}
                   {section === 'Preferences' && (
                     <>
-                      <div className="col-span-2">
-                        <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <div className="col-span-full">
+                        <h3 className={`text-base sm:text-lg font-semibold mb-2 sm:mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           Partner Preferences
                         </h3>
-                        <p className={`text-sm mb-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        <p className={`text-xs sm:text-sm mb-4 sm:mb-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
                           Set your preferences to receive notifications when matching profiles are created.
                         </p>
                       </div>
                       
                       {/* Age Range */}
-                      <div>
-                        <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <div className="col-span-full">
+                        <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                           Preferred Age Range
                         </label>
-                        <div className="flex space-x-4 mt-1">
-                          <input
-                            type="number"
-                            placeholder="Min Age"
-                            value={formData.preferences.preferredAgeRange.min || ''}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              setFormData({
-                                ...formData,
-                                preferences: {
-                                  ...formData.preferences,
-                                  preferredAgeRange: {
-                                    ...formData.preferences.preferredAgeRange,
-                                    min: value === '' ? '' : parseInt(value) || 18
+                        <div className="flex space-x-3 sm:space-x-4">
+                          <div className="flex-1">
+                            <input
+                              type="number"
+                              placeholder="Min"
+                              value={formData.preferences.preferredAgeRange.min || ''}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                setFormData({
+                                  ...formData,
+                                  preferences: {
+                                    ...formData.preferences,
+                                    preferredAgeRange: {
+                                      ...formData.preferences.preferredAgeRange,
+                                      min: value === '' ? '' : parseInt(value) || 18
+                                    }
                                   }
-                                }
-                              });
-                            }}
-                            className={`block w-full px-3 py-2 rounded-md ${
-                              darkMode
-                                ? 'bg-gray-700 border-gray-600 text-white'
-                                : 'bg-white border-gray-300 text-gray-900'
-                            } shadow-sm focus:border-red-500 focus:ring-red-500`}
-                            min="18"
-                            max="80"
-                          />
-                          <input
-                            type="number"
-                            placeholder="Max Age"
-                            value={formData.preferences.preferredAgeRange.max || ''}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              setFormData({
-                                ...formData,
-                                preferences: {
-                                  ...formData.preferences,
-                                  preferredAgeRange: {
-                                    ...formData.preferences.preferredAgeRange,
-                                    max: value === '' ? '' : parseInt(value) || 80
+                                });
+                              }}
+                              className={`block w-full px-3 sm:px-3 py-2.5 sm:py-2 text-base sm:text-base rounded-md border ${
+                                darkMode
+                                  ? 'bg-gray-700 border-gray-600 text-white'
+                                  : 'bg-white border-gray-300 text-gray-900'
+                              } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                              min="18"
+                              max="80"
+                            />
+                          </div>
+                          <span className={`flex items-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>to</span>
+                          <div className="flex-1">
+                            <input
+                              type="number"
+                              placeholder="Max"
+                              value={formData.preferences.preferredAgeRange.max || ''}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                setFormData({
+                                  ...formData,
+                                  preferences: {
+                                    ...formData.preferences,
+                                    preferredAgeRange: {
+                                      ...formData.preferences.preferredAgeRange,
+                                      max: value === '' ? '' : parseInt(value) || 80
+                                    }
                                   }
-                                }
-                              });
-                            }}
-                            className={`block w-full px-3 py-2 rounded-md ${
-                              darkMode
-                                ? 'bg-gray-700 border-gray-600 text-white'
-                                : 'bg-white border-gray-300 text-gray-900'
-                            } shadow-sm focus:border-red-500 focus:ring-red-500`}
-                            min="18"
-                            max="80"
-                          />
+                                });
+                              }}
+                              className={`block w-full px-3 sm:px-3 py-2.5 sm:py-2 text-base sm:text-base rounded-md border ${
+                                darkMode
+                                  ? 'bg-gray-700 border-gray-600 text-white'
+                                  : 'bg-white border-gray-300 text-gray-900'
+                              } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                              min="18"
+                              max="80"
+                            />
+                          </div>
                         </div>
                       </div>
 
                       {/* Education Preferences */}
-                      <div>
-                        <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <div className="col-span-full">
+                        <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                           Preferred Education
                         </label>
                         <select
@@ -1859,11 +1865,12 @@ export default function MatrimonyRegistration() {
                               }
                             });
                           }}
-                          className={`mt-1 block w-full px-3 py-2 rounded-md ${
+                          className={`block w-full px-3 py-2.5 sm:py-2 text-base sm:text-base rounded-md border ${
                             darkMode
                               ? 'bg-gray-700 border-gray-600 text-white'
                               : 'bg-white border-gray-300 text-gray-900'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
+                          size="4"
                         >
                           <option value="High School">High School</option>
                           <option value="Bachelor's Degree">Bachelor's Degree</option>
@@ -1872,16 +1879,19 @@ export default function MatrimonyRegistration() {
                           <option value="Diploma">Diploma</option>
                           <option value="Other">Other</option>
                         </select>
+                        <p className={`mt-1 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          Hold Ctrl/Cmd to select multiple
+                        </p>
                       </div>
 
                       {/* Location Preferences */}
-                      <div>
-                        <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <div className="col-span-full">
+                        <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                           Preferred Cities
                         </label>
                         <input
                           type="text"
-                          placeholder="Enter cities separated by commas"
+                          placeholder="e.g., Mumbai, Delhi, Pune"
                           value={formData.preferences.preferredCities.join(', ')}
                           onChange={(e) => {
                             const cities = e.target.value.split(',').map(city => city.trim()).filter(city => city);
@@ -1893,41 +1903,55 @@ export default function MatrimonyRegistration() {
                               }
                             });
                           }}
-                          className={`mt-1 block w-full px-3 py-2 rounded-md ${
+                          className={`block w-full px-3 py-2.5 sm:py-2 text-base sm:text-base rounded-md border ${
                             darkMode
-                              ? 'bg-gray-700 border-gray-600 text-white'
-                              : 'bg-white border-gray-300 text-gray-900'
+                              ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                           } shadow-sm focus:border-red-500 focus:ring-red-500`}
                         />
+                        <p className={`mt-1 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          Separate cities with commas
+                        </p>
                       </div>
 
                       {/* Match Threshold */}
-                      <div>
-                        <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <div className="col-span-full">
+                        <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                           Minimum Match Percentage
                         </label>
-                        <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          value={formData.preferences.matchThreshold}
-                          onChange={(e) => setFormData({
-                            ...formData,
-                            preferences: {
-                              ...formData.preferences,
-                              matchThreshold: parseInt(e.target.value)
-                            }
-                          })}
-                          className={`mt-1 block w-full`}
-                        />
-                        <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                          {formData.preferences.matchThreshold}%
-                        </span>
+                        <div className="flex items-center space-x-4">
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={formData.preferences.matchThreshold}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              preferences: {
+                                ...formData.preferences,
+                                matchThreshold: parseInt(e.target.value)
+                              }
+                            })}
+                            className={`flex-1 h-2 rounded-lg appearance-none cursor-pointer ${
+                              darkMode ? 'bg-gray-700' : 'bg-gray-200'
+                            }`}
+                            style={{
+                              background: `linear-gradient(to right, #ef4444 0%, #ef4444 ${formData.preferences.matchThreshold}%, ${darkMode ? '#374151' : '#e5e7eb'} ${formData.preferences.matchThreshold}%, ${darkMode ? '#374151' : '#e5e7eb'} 100%)`
+                            }}
+                          />
+                          <span className={`text-base sm:text-sm font-semibold min-w-[3rem] text-center px-2 py-1 rounded ${
+                            darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900'
+                          }`}>
+                            {formData.preferences.matchThreshold}%
+                          </span>
+                        </div>
                       </div>
 
                       {/* Notification Settings */}
-                      <div className="col-span-2">
-                        <div className="flex items-center space-x-4">
+                      <div className="col-span-full">
+                        <div className={`flex items-start space-x-3 p-4 rounded-lg ${
+                          darkMode ? 'bg-gray-700/30' : 'bg-gray-50'
+                        }`}>
                           <input
                             type="checkbox"
                             id="enableMatchNotifications"
@@ -1939,11 +1963,16 @@ export default function MatrimonyRegistration() {
                                 enableMatchNotifications: e.target.checked
                               }
                             })}
-                            className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                            className="mt-0.5 h-5 w-5 rounded border-gray-300 text-red-600 focus:ring-red-500"
                           />
-                          <label htmlFor="enableMatchNotifications" className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                            Enable match notifications
-                          </label>
+                          <div className="flex-1">
+                            <label htmlFor="enableMatchNotifications" className={`text-sm sm:text-sm font-medium cursor-pointer ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                              Enable match notifications
+                            </label>
+                            <p className={`mt-1 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                              Get notified when new profiles match your preferences
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </>
@@ -1952,14 +1981,14 @@ export default function MatrimonyRegistration() {
               </section>
             ))}
             <div
-              className={`flex justify-end space-x-6 pt-8 mt-12 border-t ${
+              className={`flex flex-col-reverse sm:flex-row justify-end space-y-3 space-y-reverse sm:space-y-0 sm:space-x-4 md:space-x-6 pt-5 sm:pt-8 mt-6 sm:mt-10 md:mt-12 border-t ${
                 darkMode ? 'border-gray-700' : 'border-gray-200'
               }`}
             >
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className={`px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300 ${
+                className={`w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-lg sm:rounded-2xl text-base sm:text-lg font-semibold transition-all duration-300 ${
                   darkMode
                     ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -1971,7 +2000,7 @@ export default function MatrimonyRegistration() {
               <button
                 type="submit"
                 disabled={formLoading || reduxLoading}
-                className={`px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300 flex items-center ${
+                className={`w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-lg sm:rounded-2xl text-base sm:text-lg font-bold transition-all duration-300 flex items-center justify-center mb-3 sm:mb-0 ${
                   formLoading || reduxLoading
                     ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
                     : darkMode
@@ -1980,7 +2009,7 @@ export default function MatrimonyRegistration() {
                 } shadow-lg hover:shadow-xl transform hover:scale-105`}
                 aria-label="Save profile"
               >
-                <Save className="w-5 h-5 mr-2" aria-hidden="true" />
+                <Save className="w-5 h-5 sm:w-5 sm:h-5 mr-2" aria-hidden="true" />
                 {formLoading || reduxLoading ? 'Saving...' : 'Save Profile'}
               </button>
             </div>
