@@ -7,55 +7,31 @@ export const createProfileFormData = (profileData, profilePhoto) => {
     formData.append('profilePhoto', profilePhoto);
   }
 
-  // Field mapping from frontend to backend
-  const fieldMap = {
-    profileFor: 'profileFor',
-    gender: 'gender',
-    phoneNumber: 'phoneNumber',
-    firstName: 'firstName',
-    middleName: 'middleName',
-    lastName: 'lastName',
-    fatherName: 'fatherName',
-    motherName: 'motherName',
-    dateOfBirth: 'dateOfBirth',
-    subCaste: 'subCaste',
-    gotra: 'gotra',
-    motherTongue: 'motherTongue',
-    lookingFor: 'lookingFor',
-    height: 'height',
-    maritalStatus: 'maritalStatus',
-    foodHabit: 'foodHabit',
-    highestQualification: 'HighestQualification',
-    specialization: 'specialization',
-    university: 'universityCollege',
-    yearOfCompletion: 'yearOfCompletion',
-    currentlyWorking: 'currentWorking',
-    occupation: 'occupation',
-    company: 'company',
-    workLocation: 'workLocation',
-    annualIncome: 'annualIncome',
-    instagram: 'instaUrl',
-    facebook: 'facebookUrl',
-    linkedin: 'linkedinUrl',
-    idVerificationType: 'idCardName',
-    idVerificationNumber: 'idCardNo',
-    isLivesWithFamily: 'isLivesWithFamily',
-    currentAddress: 'currentAddress',
-    permanentAddress: 'permanentAddress',
-    isCurrentPermanentSame: 'isCurrentPermanentSame',
-  };
+  console.log('createProfileFormData: profileData received:', profileData);
+  console.log('createProfileFormData: profileData keys:', Object.keys(profileData));
 
-  // Append fields to FormData
+  // Append fields to FormData directly (fields are already mapped in MatrimonyRegistration.jsx)
   Object.entries(profileData).forEach(([key, value]) => {
+    // Skip fields that should not be sent
+    if (key === 'profileForOther' || key === 'genderOther' || key === 'lookingForOther' || 
+        key === 'subCasteOther' || key === 'motherTongueOther' || key === 'highestQualificationOther' ||
+        key === 'specializationOther' || key === 'occupationOther') {
+      return;
+    }
+
     if (key === 'currentAddress' || key === 'permanentAddress') {
-      formData.append(fieldMap[key], JSON.stringify(value || {}));
+      formData.append(key, JSON.stringify(value || {}));
+      console.log(`createProfileFormData: Appended ${key}:`, JSON.stringify(value || {}));
     } else if (key === 'isCurrentPermanentSame') {
-      formData.append(fieldMap[key], value.toString()); // Convert to string ('true'/'false')
-    } else if (fieldMap[key] && value !== undefined && value !== null) {
-      formData.append(fieldMap[key], value.toString());
+      formData.append(key, value.toString());
+      console.log(`createProfileFormData: Appended ${key}:`, value.toString());
+    } else if (value !== undefined && value !== null && value !== '') {
+      formData.append(key, value.toString());
+      console.log(`createProfileFormData: Appended ${key}:`, value.toString());
     }
   });
 
+  console.log('createProfileFormData: FormData created with fields:', Array.from(formData.keys()));
   return formData;
 };
 

@@ -139,11 +139,13 @@ export default function MatrimonyRegistration() {
   });
 
   useEffect(() => {
+    console.log('MatrimonyRegistration: First useEffect - Checking auth');
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     const token = localStorage.getItem('token');
-    if (isDev) console.log('MatrimonyRegistration: Token', token);
+    console.log('MatrimonyRegistration: Auth check', { isLoggedIn, hasToken: !!token });
 
     if (!isLoggedIn || !token) {
+      console.log('MatrimonyRegistration: No login or token found, redirecting to /login');
       if (isDev) {
         console.group('MatrimonyRegistration: useEffect');
         console.log('No login or token found, redirecting to /login');
@@ -155,9 +157,12 @@ export default function MatrimonyRegistration() {
 
     try {
       const decoded = jwtDecode(token);
-      if (isDev) console.log('Decoded Token:', decoded);
+      console.log('MatrimonyRegistration: Decoded Token:', decoded);
+      console.log('MatrimonyRegistration: isProfileFlag from token:', decoded.isProfileFlag);
       setIsProfileFlag(decoded.isProfileFlag || false);
+      console.log('MatrimonyRegistration: Set isProfileFlag state to:', decoded.isProfileFlag || false);
     } catch (err) {
+      console.error('MatrimonyRegistration: Token decode error:', err);
       if (isDev) console.error('Token decode error:', err);
       setFormError('Invalid or expired token. Please log in again.');
       localStorage.removeItem('isLoggedIn');
@@ -167,18 +172,26 @@ export default function MatrimonyRegistration() {
   }, [navigate]);
 
   useEffect(() => {
+    console.log('MatrimonyRegistration: useEffect triggered', { isProfileFlag });
     if (isProfileFlag) {
       const token = localStorage.getItem('token');
+      console.log('MatrimonyRegistration: Fetching profile with token', { hasToken: !!token });
       if (isDev) console.group('MatrimonyRegistration: Fetch Profile');
       dispatch(getProfile(token)).then((result) => {
+        console.log('MatrimonyRegistration: getProfile result', { 
+          status: result.meta.requestStatus,
+          hasPayload: !!result.payload,
+          hasData: !!result.payload?.data,
+          hasProfile: !!result.payload?.data?.profile
+        });
+        
         if (result.meta.requestStatus === 'fulfilled' && result.payload.data?.profile) {
           const profileData = result.payload.data.profile;
-          if (isDev) {
-            console.log('Profile fetched:', profileData);
-            console.log('Profile data keys:', Object.keys(profileData));
-          }
-          setFormData((prev) => ({
-            ...prev,
+          console.log('MatrimonyRegistration: Profile fetched successfully');
+          console.log('Profile data keys:', Object.keys(profileData));
+          console.log('Profile data:', profileData);
+          
+          const mappedData = {
             profileFor: profileData.profileFor || '',
             gender: profileData.gender || '',
             phoneNumber: profileData.phoneNumber || '',
@@ -223,11 +236,30 @@ export default function MatrimonyRegistration() {
             linkedin: profileData.linkedinUrl || '',
             idVerificationType: profileData.idCardName || '',
             idVerificationNumber: profileData.idCardNo || '',
+          };
+          
+          console.log('MatrimonyRegistration: Mapped data for form:', mappedData);
+          console.log('MatrimonyRegistration: Key fields check:', {
+            highestQualification: mappedData.highestQualification,
+            university: mappedData.university,
+            instagram: mappedData.instagram,
+            facebook: mappedData.facebook,
+            linkedin: mappedData.linkedin,
+            idVerificationType: mappedData.idVerificationType,
+            idVerificationNumber: mappedData.idVerificationNumber
+          });
+          
+          setFormData((prev) => ({
+            ...prev,
+            ...mappedData
           }));
+          
           if (profileData.profilePicture) {
+            console.log('MatrimonyRegistration: Setting profile image preview', profileData.profilePicture);
             setProfileImagePreview(profileData.profilePicture);
           }
         } else if (result.meta.requestStatus === 'rejected') {
+          console.error('MatrimonyRegistration: Fetch Profile REJECTED', result.payload);
           if (isDev) console.error('Fetch Profile Error:', result.payload);
           setFormError(handleApiError(result.payload));
           if (result.payload?.statusCode === 401) {
@@ -236,6 +268,8 @@ export default function MatrimonyRegistration() {
             navigate('/login');
           }
         }
+      }).catch((error) => {
+        console.error('MatrimonyRegistration: getProfile promise error', error);
       });
       if (isDev) console.groupEnd();
     }
@@ -395,10 +429,13 @@ export default function MatrimonyRegistration() {
         university: formData.university,
         yearOfCompletion: formData.yearOfCompletion,
         currentWorking: formData.currentWorking,
-        occupation: formData.occupation,
-        company: formData.company,
-        workLocation: formData.workLocation,
-        annualIncome: formData.annualIncome,
+        // Only require occupation details if currently working
+        ...(formData.currentWorking === 'Yes' ? {
+          occupation: formData.occupation,
+          company: formData.company,
+          workLocation: formData.workLocation,
+          annualIncome: formData.annualIncome,
+        } : {}),
         ...(isProfileFlag ? {} : { // Conditionally include ID verification fields
           idVerificationType: formData.idVerificationType,
           idVerificationNumber: formData.idVerificationNumber,
@@ -449,9 +486,9 @@ export default function MatrimonyRegistration() {
       // Map form fields to backend field names
       const backendData = {
         ...submitData,
-        subCaste: submitData.subCaste, // Keep as is
-        foodHabit: submitData.foodHabit, // Keep as is
+        HighestQualification: submitData.highestQualification, // Map to capital H and Q
         universityCollege: submitData.university, // Map university to universityCollege
+        isCurrentPermanentSame: submitData.permanentAddress.sameAsTemporary, // Map to isCurrentPermanentSame
         instaUrl: submitData.instagram, // Map instagram to instaUrl
         facebookUrl: submitData.facebook, // Map facebook to facebookUrl
         linkedinUrl: submitData.linkedin, // Map linkedin to linkedinUrl
@@ -460,12 +497,14 @@ export default function MatrimonyRegistration() {
       };
       
       // Remove the old field names to avoid confusion
+      delete backendData.highestQualification;
       delete backendData.university;
       delete backendData.instagram;
       delete backendData.facebook;
       delete backendData.linkedin;
       delete backendData.idVerificationType;
       delete backendData.idVerificationNumber;
+      delete backendData.preferences; // Preferences are saved separately
 
       if (isDev) {
         console.log('Submitting backend data:', backendData);
@@ -537,7 +576,21 @@ export default function MatrimonyRegistration() {
     }
   };
 
+  console.log('MatrimonyRegistration: Render', { 
+    isProfileFlag, 
+    reduxLoading, 
+    hasFormData: !!formData,
+    formDataKeys: Object.keys(formData),
+    sampleFields: {
+      firstName: formData.firstName,
+      highestQualification: formData.highestQualification,
+      university: formData.university,
+      instagram: formData.instagram
+    }
+  });
+
   if (reduxLoading && isProfileFlag) {
+    console.log('MatrimonyRegistration: Showing loading spinner');
     return (
       <div
         className={`min-h-screen flex items-center justify-center ${
@@ -1533,13 +1586,15 @@ export default function MatrimonyRegistration() {
                           </div>
                         </fieldset>
                       </div>
-                      <div>
-                        <label
-                          htmlFor="occupation"
-                          className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
-                        >
-                          Occupation <span className="text-red-500" aria-hidden="true">*</span>
-                        </label>
+                      {formData.currentWorking === 'Yes' && (
+                        <>
+                          <div>
+                            <label
+                              htmlFor="occupation"
+                              className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                            >
+                              Occupation <span className="text-red-500" aria-hidden="true">*</span>
+                            </label>
                         <select
                           id="occupation"
                           name="occupation"
@@ -1653,6 +1708,17 @@ export default function MatrimonyRegistration() {
                           <option value="50+">Above 50 LPA</option>
                         </select>
                       </div>
+                        </>
+                      )}
+                      {formData.currentWorking === 'No' && (
+                        <div className="col-span-full">
+                          <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700/30' : 'bg-gray-50'} text-center`}>
+                            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                              Employment details are not required since you are not currently working.
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </>
                   )}
                   {section === 'Social Media Profiles' && (

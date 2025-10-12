@@ -159,6 +159,16 @@ const profileSlice = createSlice({
         }
         state.loading = false;
         state.profile = action.payload.data?.profile || null;
+        console.log('ProfileSlice: Profile data stored in Redux:', state.profile);
+        console.log('ProfileSlice: Key fields in stored profile:', {
+          HighestQualification: state.profile?.HighestQualification,
+          universityCollege: state.profile?.universityCollege,
+          instaUrl: state.profile?.instaUrl,
+          facebookUrl: state.profile?.facebookUrl,
+          linkedinUrl: state.profile?.linkedinUrl,
+          idCardName: state.profile?.idCardName,
+          idCardNo: state.profile?.idCardNo
+        });
         if (isDev) {
           console.log('Updated State:', state);
           console.groupEnd();

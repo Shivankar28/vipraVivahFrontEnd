@@ -4,10 +4,26 @@ import { BASE_URL } from "../constants/config";
 const APIConnector = {
   async request(config) {
     try {
+      console.log('APIConnector: Making request', { 
+        method: config.method, 
+        url: config.url,
+        hasHeaders: !!config.headers,
+        hasData: !!config.data
+      });
       const response = await axios(config);
-      console.log("response in api connector", response);
+      console.log("APIConnector: Response received", { 
+        status: response.status,
+        hasData: !!response.data,
+        dataKeys: response.data ? Object.keys(response.data) : []
+      });
+      console.log("APIConnector: Full response data", response.data);
       return response.data;
     } catch (error) {
+      console.error('APIConnector: Request failed', { 
+        url: config.url,
+        status: error.response?.status,
+        message: error.message
+      });
       if (error.response?.data) {
         const err = error.response.data;
         err.statusCode = error.response.status; // Match backend's ApiResponse
