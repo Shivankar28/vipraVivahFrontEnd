@@ -1,6 +1,94 @@
 import axios from "axios";
 import { BASE_URL } from "../constants/config";
 
+// Create axios instance
+const axiosInstance = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true, // Important for cookies
+});
+
+// Flag to prevent multiple refresh attempts
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  
+  failedQueue = [];
+};
+
+// Response interceptor for automatic token refresh
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // If error is 401 and we haven't tried to refresh yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // If already refreshing, queue this request
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(token => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return axiosInstance(originalRequest);
+          })
+          .catch(err => {
+            return Promise.reject(err);
+          });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        // Try to refresh token
+        const response = await axiosInstance.post('/api/auth/refresh');
+        const { token } = response.data.data;
+        
+        // Update token in localStorage
+        localStorage.setItem('token', token);
+        
+        // Update authorization header
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        
+        // Process queued requests
+        processQueue(null, token);
+        
+        isRefreshing = false;
+        
+        // Retry original request
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        // Refresh failed - logout user
+        processQueue(refreshError, null);
+        isRefreshing = false;
+        
+        // Clear auth data
+        localStorage.removeItem('token');
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('loginTimestamp');
+        
+        // Redirect to login
+        window.location.href = '/login';
+        
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 const APIConnector = {
   async request(config) {
     try {
@@ -10,7 +98,7 @@ const APIConnector = {
         hasHeaders: !!config.headers,
         hasData: !!config.data
       });
-      const response = await axios(config);
+      const response = await axiosInstance(config);
       console.log("APIConnector: Response received", { 
         status: response.status,
         hasData: !!response.data,
@@ -83,6 +171,20 @@ const APIConnector = {
       method: "POST",
       url: `${BASE_URL}/api/auth/resend-otp`,
       data,
+      headers: { "Content-Type": "application/json" },
+    }),
+
+  refreshToken: () =>
+    APIConnector.request({
+      method: "POST",
+      url: `${BASE_URL}/api/auth/refresh`,
+      headers: { "Content-Type": "application/json" },
+    }),
+
+  logout: () =>
+    APIConnector.request({
+      method: "POST",
+      url: `${BASE_URL}/api/auth/logout`,
       headers: { "Content-Type": "application/json" },
     }),
 

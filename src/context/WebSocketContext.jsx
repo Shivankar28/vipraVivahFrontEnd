@@ -152,7 +152,7 @@ export const WebSocketProvider = ({ children }) => {
     };
   }, []);
 
-  // Listen for login/logout events
+  // Listen for login/logout events and token refresh
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === 'token' || e.key === 'isLoggedIn') {
@@ -160,17 +160,34 @@ export const WebSocketProvider = ({ children }) => {
         const isLoggedIn = localStorage.getItem('isLoggedIn');
         
         if (token && isLoggedIn === 'true') {
-          connect(token);
+          // Reconnect with new token
+          console.log('WebSocket: Token changed, reconnecting...');
+          disconnect();
+          setTimeout(() => connect(token), 500); // Small delay before reconnect
         } else {
           disconnect();
         }
       }
     };
 
+    // Also listen for custom token refresh event
+    const handleTokenRefresh = (e) => {
+      const token = e.detail?.token || localStorage.getItem('token');
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      
+      if (token && isLoggedIn === 'true') {
+        console.log('WebSocket: Token refreshed, reconnecting...');
+        disconnect();
+        setTimeout(() => connect(token), 500); // Small delay before reconnect
+      }
+    };
+
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('tokenRefreshed', handleTokenRefresh);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('tokenRefreshed', handleTokenRefresh);
     };
   }, []);
 

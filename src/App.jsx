@@ -20,12 +20,53 @@ import AdminDashboard from './components/Pages/AdminDashboard';
 import AdminUsers from './components/Pages/AdminUsers';
 import AdminProfiles from './components/Pages/AdminProfiles';
 import AdminSubscriptions from './components/Pages/AdminSubscriptions';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import { store } from '../src/redux/store';
 import { setPlan } from './redux/slices/subscriptionSlice';
 import { getPlanFromToken } from './utils/decodeToken';
+import { refreshToken } from './redux/slices/authSlice';
 import { WebSocketProvider } from './context/WebSocketContext';
 import { useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
+
+// Component to handle token refresh
+function TokenRefreshManager() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Check token expiry on mount
+    const checkTokenExpiry = () => {
+      const token = localStorage.getItem('token');
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      
+      if (token && isLoggedIn === 'true') {
+        try {
+          const decoded = jwtDecode(token);
+          const currentTime = Date.now() / 1000;
+          const timeUntilExpiry = decoded.exp - currentTime;
+          
+          // If token expires in less than 5 minutes, refresh it
+          if (timeUntilExpiry < 300) { // 5 minutes = 300 seconds
+            console.log('Token expiring soon, refreshing...');
+            dispatch(refreshToken());
+          }
+        } catch (error) {
+          console.error('Error decoding token:', error);
+        }
+      }
+    };
+
+    // Check immediately on mount
+    checkTokenExpiry();
+
+    // Set up interval to check every minute
+    const interval = setInterval(checkTokenExpiry, 60000); // Check every minute
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
+  return null;
+}
 
 function App() {
   useEffect(() => {
@@ -38,6 +79,7 @@ function App() {
   return (
     <Provider store={store}>
       <WebSocketProvider>
+        <TokenRefreshManager />
         <Routes>
           <Route path="/" element={<ViprVivahHomepage />} />
           <Route path="/login" element={<Login />} />

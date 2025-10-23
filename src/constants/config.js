@@ -9,7 +9,8 @@ const getBaseURL = () => {
   //   return 'http://192.168.1.5:3000'; // Change to your IP like 'http://192.168.1.100:3000'
   // }
   // Production URL
-  return 'https://api.vipravivah.in';
+  // return 'https://api.vipravivah.in';
+  return 'http://localhost:3000';
 };
 
 const BASE_URL = getBaseURL();

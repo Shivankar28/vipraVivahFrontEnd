@@ -8,6 +8,8 @@ import {jwtDecode} from 'jwt-decode'; // Import jwt-decode
 import { notifyWelcome } from '../../utils/notificationUtils';
 import Header from '../Header';
 import Footer from '../Footer';
+import ForgotPasswordModal from '../modals/ForgotPasswordModal';
+import ResetPasswordModal from '../modals/ResetPasswordModal';
 
 // Utility to check if in development mode
 const isDev = process.env.NODE_ENV === 'development';
@@ -23,6 +25,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
 
   const { loading, error: authError } = useSelector((state) => state.auth);
 
@@ -209,6 +214,29 @@ export default function Login() {
     setActiveTab(tab);
   };
 
+  // Handle OTP sent from forgot password modal
+  const handleOtpSent = (email) => {
+    if (isDev) {
+      console.log('Forgot Password: OTP sent to', email);
+    }
+    setForgotPasswordEmail(email);
+    setShowForgotPasswordModal(false);
+    setShowResetPasswordModal(true);
+  };
+
+  // Handle password reset success
+  const handlePasswordResetSuccess = () => {
+    if (isDev) {
+      console.log('Password reset successful');
+    }
+    setShowResetPasswordModal(false);
+    setForgotPasswordEmail('');
+    setActiveTab('login');
+    setError('');
+    // Optionally show success message
+    alert('Password reset successfully! You can now login with your new password.');
+  };
+
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
@@ -344,16 +372,17 @@ export default function Login() {
                   
                   <div className="text-right">
                     <button 
+                      type="button"
                       className={`text-sm font-medium ${
                         darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-700'
                       } transition-colors`}
                       onClick={() => {
                         if (isDev) {
                           console.group('Login: Forgot Password Click');
-                          console.log('Action: Triggering forgot password alert');
+                          console.log('Action: Opening forgot password modal');
                           console.groupEnd();
                         }
-                        alert('Password reset functionality coming soon!');
+                        setShowForgotPasswordModal(true);
                       }}
                     >
                       Forgot password?
@@ -522,6 +551,23 @@ export default function Login() {
 
       {/* Footer */}
       <Footer />
+
+      {/* Modals */}
+      <ForgotPasswordModal
+        isOpen={showForgotPasswordModal}
+        onClose={() => setShowForgotPasswordModal(false)}
+        onOtpSent={handleOtpSent}
+      />
+
+      <ResetPasswordModal
+        isOpen={showResetPasswordModal}
+        onClose={() => {
+          setShowResetPasswordModal(false);
+          setForgotPasswordEmail('');
+        }}
+        email={forgotPasswordEmail}
+        onSuccess={handlePasswordResetSuccess}
+      />
     </div>
   );
 }

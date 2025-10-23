@@ -104,6 +104,40 @@ export const getAuthProfile = createAsyncThunk(
   }
 );
 
+export const refreshToken = createAsyncThunk(
+  'auth/refreshToken',
+  async (_, { rejectWithValue }) => {
+    if (isDev) console.log('auth/refreshToken: Refreshing token');
+    try {
+      const response = await APIConnector.refreshToken();
+      if (response.error) {
+        if (isDev) console.error('auth/refreshToken: API error:', response.error);
+        return rejectWithValue(response.error);
+      }
+      if (isDev) console.log('auth/refreshToken: API success:', response);
+      return response;
+    } catch (error) {
+      if (isDev) console.error('auth/refreshToken: Error:', error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  'auth/logoutUser',
+  async (_, { rejectWithValue }) => {
+    if (isDev) console.log('auth/logoutUser: Logging out');
+    try {
+      const response = await APIConnector.logout();
+      if (isDev) console.log('auth/logoutUser: API success:', response);
+      return response;
+    } catch (error) {
+      if (isDev) console.error('auth/logoutUser: Error:', error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
 const initialState = {
   user: null,
   token: null,
@@ -408,6 +442,103 @@ const authSlice = createSlice({
           console.log('Initial State:', state);
           console.log('Action Payload:', action.payload);
         }
+        state.loading = false;
+        state.error = handleApiError(action.payload);
+        if (isDev) {
+          console.error('Error:', state.error);
+          console.log('Updated State:', state);
+          console.groupEnd();
+        }
+      })
+      // Refresh Token
+      .addCase(refreshToken.pending, (state) => {
+        if (isDev) {
+          console.group('auth/refreshToken: pending');
+          console.log('Initial State:', state);
+        }
+        state.loading = true;
+        state.error = null;
+        if (isDev) {
+          console.log('Updated State:', state);
+          console.groupEnd();
+        }
+      })
+      .addCase(refreshToken.fulfilled, (state, action) => {
+        if (isDev) {
+          console.group('auth/refreshToken: fulfilled');
+          console.log('Initial State:', state);
+          console.log('Action Payload:', action.payload);
+        }
+        state.loading = false;
+        if (action.payload.data) {
+          state.token = action.payload.data.token;
+          state.isAuthenticated = true;
+          
+          // Dispatch custom event for WebSocket reconnection
+          const event = new CustomEvent('tokenRefreshed', { 
+            detail: { token: action.payload.data.token } 
+          });
+          window.dispatchEvent(event);
+        }
+        if (isDev) {
+          console.log('Updated State:', state);
+          console.groupEnd();
+        }
+      })
+      .addCase(refreshToken.rejected, (state, action) => {
+        if (isDev) {
+          console.group('auth/refreshToken: rejected');
+          console.log('Initial State:', state);
+          console.log('Action Payload:', action.payload);
+        }
+        state.loading = false;
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        state.error = handleApiError(action.payload);
+        if (isDev) {
+          console.error('Error:', state.error);
+          console.log('Updated State:', state);
+          console.groupEnd();
+        }
+      })
+      // Logout User
+      .addCase(logoutUser.pending, (state) => {
+        if (isDev) {
+          console.group('auth/logoutUser: pending');
+          console.log('Initial State:', state);
+        }
+        state.loading = true;
+        if (isDev) {
+          console.log('Updated State:', state);
+          console.groupEnd();
+        }
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        if (isDev) {
+          console.group('auth/logoutUser: fulfilled');
+          console.log('Before logout - State:', state);
+        }
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        state.error = null;
+        state.loading = false;
+        if (isDev) {
+          console.log('After logout - State:', state);
+          console.groupEnd();
+        }
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        if (isDev) {
+          console.group('auth/logoutUser: rejected');
+          console.log('Initial State:', state);
+          console.log('Action Payload:', action.payload);
+        }
+        // Clear state even if logout fails
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
         state.loading = false;
         state.error = handleApiError(action.payload);
         if (isDev) {
