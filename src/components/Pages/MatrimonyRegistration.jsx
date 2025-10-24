@@ -273,9 +273,9 @@ export default function MatrimonyRegistration() {
           if (isEditMode) {
             setPreferencesLoading(true);
             try {
-              console.log('MatrimonyRegistration: Fetching preferences from:', `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/preferences`);
+              console.log('MatrimonyRegistration: Fetching preferences from:', `${import.meta.env.VITE_API_URL || "https://api.vipravivah.in"}/api/preferences`);
               const preferencesResponse = await fetch(
-                `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/preferences`,
+                `${import.meta.env.VITE_API_URL || "https://api.vipravivah.in"}/api/preferences`,
                 {
                   method: "GET",
                   headers: {
@@ -604,14 +604,14 @@ export default function MatrimonyRegistration() {
           console.log('MatrimonyRegistration: Preferences exist, proceeding to save...');
           try {
             console.log('MatrimonyRegistration: Saving preferences:', formData.preferences);
-            console.log('MatrimonyRegistration: API URL:', import.meta.env.VITE_API_URL || "http://localhost:3000");
+            console.log('MatrimonyRegistration: API URL:', import.meta.env.VITE_API_URL || "https://api.vipravivah.in");
             console.log('MatrimonyRegistration: Token exists:', !!token);
             
             // First test the endpoint
             console.log('MatrimonyRegistration: Testing preferences endpoint...');
             const testResponse = await fetch(
               `${
-                import.meta.env.VITE_API_URL || "http://localhost:3000"
+                import.meta.env.VITE_API_URL || "https://api.vipravivah.in"
               }/api/preferences/test`,
               {
                 method: "POST",
@@ -626,7 +626,7 @@ export default function MatrimonyRegistration() {
             
             const preferencesResponse = await fetch(
               `${
-                import.meta.env.VITE_API_URL || "http://localhost:3000"
+                import.meta.env.VITE_API_URL || "https://api.vipravivah.in"
               }/api/preferences`,
               {
                 method: "POST",

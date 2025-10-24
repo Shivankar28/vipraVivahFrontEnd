@@ -10,7 +10,7 @@ const getBaseURL = () => {
   // }
   // Production URL
   // return 'https://api.vipravivah.in';
-  return 'http://localhost:3000';
+  return 'https://api.vipravivah.in';
 };
 
 const BASE_URL = getBaseURL();
