@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTheme } from '../../context/ThemeContext';
 import { HeartHandshake, Moon, Sun, Save, ArrowLeft, Upload, Camera, UserPlus, Sparkles, GraduationCap, Briefcase, Globe, Shield, Heart, Settings } from 'lucide-react';
@@ -41,6 +41,7 @@ const getSubtitle = (section) => {
 
 export default function MatrimonyRegistration() {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { darkMode, toggleDarkMode } = useTheme();
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true' && !!localStorage.getItem('token');
@@ -50,6 +51,7 @@ export default function MatrimonyRegistration() {
   const [profileImage, setProfileImage] = useState(null);
   const [profileImagePreview, setProfileImagePreview] = useState(null);
   const [isProfileFlag, setIsProfileFlag] = useState(false);
+  const [preferencesLoading, setPreferencesLoading] = useState(false);
   const [formData, setFormData] = useState({
     profileFor: '',
     gender: '',
@@ -159,8 +161,15 @@ export default function MatrimonyRegistration() {
       const decoded = jwtDecode(token);
       console.log('MatrimonyRegistration: Decoded Token:', decoded);
       console.log('MatrimonyRegistration: isProfileFlag from token:', decoded.isProfileFlag);
-      setIsProfileFlag(decoded.isProfileFlag || false);
-      console.log('MatrimonyRegistration: Set isProfileFlag state to:', decoded.isProfileFlag || false);
+      
+      // Check if we're in edit mode from location state
+      const isEditMode = location.state?.editMode || false;
+      console.log('MatrimonyRegistration: Edit mode from location state:', isEditMode);
+      
+      // Set isProfileFlag to true if either token says profile exists OR we're in edit mode
+      const shouldLoadProfile = decoded.isProfileFlag || isEditMode;
+      setIsProfileFlag(shouldLoadProfile);
+      console.log('MatrimonyRegistration: Set isProfileFlag state to:', shouldLoadProfile);
     } catch (err) {
       console.error('MatrimonyRegistration: Token decode error:', err);
       if (isDev) console.error('Token decode error:', err);
@@ -169,15 +178,16 @@ export default function MatrimonyRegistration() {
       localStorage.removeItem('token');
       navigate('/login');
     }
-  }, [navigate]);
+  }, [navigate, location.state]);
 
   useEffect(() => {
     console.log('MatrimonyRegistration: useEffect triggered', { isProfileFlag });
     if (isProfileFlag) {
       const token = localStorage.getItem('token');
+      const isEditMode = location.state?.editMode || false;
       console.log('MatrimonyRegistration: Fetching profile with token', { hasToken: !!token });
       if (isDev) console.group('MatrimonyRegistration: Fetch Profile');
-      dispatch(getProfile(token)).then((result) => {
+      dispatch(getProfile(token)).then(async (result) => {
         console.log('MatrimonyRegistration: getProfile result', { 
           status: result.meta.requestStatus,
           hasPayload: !!result.payload,
@@ -258,6 +268,61 @@ export default function MatrimonyRegistration() {
             console.log('MatrimonyRegistration: Setting profile image preview', profileData.profilePicture);
             setProfileImagePreview(profileData.profilePicture);
           }
+          
+          // Fetch user preferences if in edit mode
+          if (isEditMode) {
+            setPreferencesLoading(true);
+            try {
+              console.log('MatrimonyRegistration: Fetching preferences from:', `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/preferences`);
+              const preferencesResponse = await fetch(
+                `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/preferences`,
+                {
+                  method: "GET",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+              
+              if (preferencesResponse.ok) {
+                const preferencesData = await preferencesResponse.json();
+                console.log('MatrimonyRegistration: Preferences fetched successfully', preferencesData);
+                
+                // Handle different response structures
+                let preferencesToUse = null;
+                if (preferencesData.data?.preferences) {
+                  // If data is nested under preferences key
+                  preferencesToUse = preferencesData.data.preferences;
+                } else if (preferencesData.data) {
+                  // If data is directly in data key
+                  preferencesToUse = preferencesData.data;
+                } else if (preferencesData.preferences) {
+                  // If preferences is at root level
+                  preferencesToUse = preferencesData.preferences;
+                }
+                
+                if (preferencesToUse) {
+                  console.log('MatrimonyRegistration: Using preferences data:', preferencesToUse);
+                  setFormData((prev) => ({
+                    ...prev,
+                    preferences: {
+                      ...prev.preferences,
+                      ...preferencesToUse
+                    }
+                  }));
+                } else {
+                  console.warn('MatrimonyRegistration: No valid preferences data found in response');
+                }
+              } else {
+                console.warn('MatrimonyRegistration: Failed to fetch preferences, using defaults');
+              }
+            } catch (prefError) {
+              console.warn('MatrimonyRegistration: Error fetching preferences:', prefError);
+            } finally {
+              setPreferencesLoading(false);
+            }
+          }
         } else if (result.meta.requestStatus === 'rejected') {
           console.error('MatrimonyRegistration: Fetch Profile REJECTED', result.payload);
           if (isDev) console.error('Fetch Profile Error:', result.payload);
@@ -273,7 +338,7 @@ export default function MatrimonyRegistration() {
       });
       if (isDev) console.groupEnd();
     }
-  }, [isProfileFlag, dispatch, navigate]);
+  }, [isProfileFlag, dispatch, navigate, location.state]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -520,12 +585,48 @@ export default function MatrimonyRegistration() {
         localStorage.setItem('isProfileFlag', 'true');
         localStorage.removeItem('isNewUser');
         
+        console.log('MatrimonyRegistration: Profile saved, now checking preferences...');
+        console.log('MatrimonyRegistration: Current formData.preferences:', formData.preferences);
+        
         // Save preferences if they exist
+        console.log('MatrimonyRegistration: Checking preferences data:', {
+          hasPreferences: !!formData.preferences,
+          preferencesKeys: formData.preferences ? Object.keys(formData.preferences) : [],
+          preferencesData: formData.preferences
+        });
+        
+        console.log('MatrimonyRegistration: About to check if preferences exist...');
+        console.log('MatrimonyRegistration: formData.preferences value:', formData.preferences);
+        console.log('MatrimonyRegistration: typeof formData.preferences:', typeof formData.preferences);
+        console.log('MatrimonyRegistration: formData.preferences is truthy:', !!formData.preferences);
+        
         if (formData.preferences) {
+          console.log('MatrimonyRegistration: Preferences exist, proceeding to save...');
           try {
+            console.log('MatrimonyRegistration: Saving preferences:', formData.preferences);
+            console.log('MatrimonyRegistration: API URL:', import.meta.env.VITE_API_URL || "http://localhost:3000");
+            console.log('MatrimonyRegistration: Token exists:', !!token);
+            
+            // First test the endpoint
+            console.log('MatrimonyRegistration: Testing preferences endpoint...');
+            const testResponse = await fetch(
+              `${
+                import.meta.env.VITE_API_URL || "http://localhost:3000"
+              }/api/preferences/test`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ test: 'data' }),
+              }
+            );
+            console.log('MatrimonyRegistration: Test response status:', testResponse.status);
+            
             const preferencesResponse = await fetch(
               `${
-                import.meta.env.VITE_API_URL || "https://api.vipravivah.in"
+                import.meta.env.VITE_API_URL || "http://localhost:3000"
               }/api/preferences`,
               {
                 method: "POST",
@@ -537,15 +638,24 @@ export default function MatrimonyRegistration() {
               }
             );
             
+            console.log('MatrimonyRegistration: Preferences response status:', preferencesResponse.status);
+            console.log('MatrimonyRegistration: Preferences response ok:', preferencesResponse.ok);
+            
             if (preferencesResponse.ok) {
-              if (isDev) console.log('Preferences saved successfully');
+              const preferencesResult = await preferencesResponse.json();
+              console.log('MatrimonyRegistration: Preferences saved successfully:', preferencesResult);
             } else {
-              if (isDev) console.warn('Failed to save preferences, but profile was saved');
+              const errorData = await preferencesResponse.json();
+              console.warn('MatrimonyRegistration: Failed to save preferences:', errorData);
+              // Don't throw error here as profile was saved successfully
             }
-          } catch (prefError) {
-            if (isDev) console.warn('Error saving preferences:', prefError);
+            } catch (prefError) {
+              console.warn('MatrimonyRegistration: Error saving preferences:', prefError);
+              // Don't throw error here as profile was saved successfully
+            }
+          } else {
+            console.log('MatrimonyRegistration: No preferences found, skipping preferences save');
           }
-        }
         
         // Trigger appropriate notification based on whether it's a new profile or update
         if (isProfileFlag) {
@@ -1862,6 +1972,7 @@ export default function MatrimonyRegistration() {
                               value={formData.preferences.preferredAgeRange.min || ''}
                               onChange={(e) => {
                                 const value = e.target.value;
+                                console.log('MatrimonyRegistration: Age range min changed to:', value);
                                 setFormData({
                                   ...formData,
                                   preferences: {
@@ -1923,6 +2034,7 @@ export default function MatrimonyRegistration() {
                           value={formData.preferences.preferredEducation}
                           onChange={(e) => {
                             const selected = Array.from(e.target.selectedOptions, option => option.value);
+                            console.log('MatrimonyRegistration: Education preferences changed to:', selected);
                             setFormData({
                               ...formData,
                               preferences: {
